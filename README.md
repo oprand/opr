@@ -45,7 +45,7 @@ SSL
 ## Installation
 
 ```
-go install github.com/oprand/opr@latest
+go install github.com/oprand/opr/cmd/opr@latest
 ```
 
 The `opr` binary will be installed in the directory named by the `$GOBIN` environment
