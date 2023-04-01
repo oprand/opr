@@ -65,9 +65,11 @@ If you don't have `go` installed, download our [latest release](https://github.c
 - We provide a `SHA-256` checksum for our releases
 - The tool doesn't include any auto-updating mechanism
 - Dependencies are kept to a minimum and are vetted for any security issue
-- The tool only connect to one extenal domain that oprand.com operates
+- The tool only connects to one external domain that oprand.com operates
 
-### Release Signing GPG Public Key
+### How To Use Our Public Key
+
+Key signatures allow you verify the binary was indeed provided by us. Here is our release signing public key:
 
 ```
 -----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -83,6 +85,38 @@ AG7g3mb/N7InAP46RTjbswObz5eAWhP8t2W058JHGwBSzVAgavRtXqkkAw==
 =16ZD
 -----END PGP PUBLIC KEY BLOCK-----
 ```
+
+#### Import Our Public Key
+
+Once you saved our public key above into a file named `oprand.pub.gpg`, run this command:
+
+```
+gpg --import oprand.pub.gpg
+```
+
+You can verify it was imported successfully with `gpg --list-keys`.
+
+#### Verify Our Releases Signature
+
+After having imported our key, and downloaded the binary `opr` and its signature file `opr.sig`, run:
+
+```
+gpg --verify --default-key=B2165DEA86E9239A64FE248AF32C89E2AEA58760 opr.sig opr
+```
+
+A `gpg: Good signature` message should be displayed with other information.
+
+### How To Verify Our Releases Checksum
+
+Checksum allows you to verify the integrity of the binary you downloaded.
+
+Download the `opr.sha256` file associated with the release. Then from the same folder as the `opr` binary, run:
+
+```
+sha256sum --check opr.checksum
+```
+
+You should see `opr: OK` on the screen.
 
 ## License
 
