@@ -32,7 +32,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-            go-version-file: 'go.mod'
+          go-version-file: "go.mod"
 
       - name: Go Format
         run: gofmt -s -w . && git diff --exit-code
