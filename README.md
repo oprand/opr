@@ -1,6 +1,12 @@
 # `opr` - Oprand CLI Tool
 
-[Oprand](https://oprand.com/) provides phishing threat and domain impersonation detection services. We publish a public [Phishing Threat Report](https://oprand.com/report).
+[![vuln](https://github.com/oprand/opr/actions/workflows/vuln.yml/badge.svg?branch=master)](https://github.com/oprand/opr/actions/workflows/vuln.yml)
+[![build](https://github.com/oprand/opr/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/oprand/opr/actions/workflows/build.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/oprand/opr)](https://goreportcard.com/report/github.com/oprand/opr)
+
+[Oprand](https://oprand.com/) provides phishing threat and domain impersonation detection services.
+
+We publish a public [Phishing Threat Report](https://oprand.com/report).
 
 This CLI tool helps you fetch your latest scan data.
 
