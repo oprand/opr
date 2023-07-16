@@ -1,4 +1,4 @@
-package cli
+package client
 
 import (
 	"io"
@@ -10,8 +10,7 @@ import (
 
 func getResultTemplate(output io.Writer) (*template.Template, error) {
 
-	line :=
-		`{{ Background "#FFC107" " ⁃ " }} {{ .FuzzedDomainUnicode}}  {{Bold "fuzzer:"}}{{.Fuzzer }}  {{ Bold "scanned:"}}{{.ScannedAt | date "2006-01-02 15:04" }} ({{.ScannedAtSince}} ago)
+	const line = `{{ Background "#FFC107" " ⁃ " }} {{ .FuzzedDomainUnicode}}  {{Bold "fuzzer:"}}{{.Fuzzer }}  {{ Bold "scanned:"}}{{.ScannedAt | date "2006-01-02 15:04" }} ({{.ScannedAtSince}} ago)
 {{Bold "DNS"}}
 {{if .DnsA}}    {{Bold "A"}}          {{.DnsA | join "  "}}
 {{end}}{{if .DnsNS}}    {{Bold "NS"}}         {{.DnsNS | join "  "}}

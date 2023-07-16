@@ -1,4 +1,4 @@
-package cli
+package client
 
 import (
 	"encoding/json"
@@ -141,9 +141,8 @@ func (op *OprClient) FetchResults(c *urfavcli.Context, domain string) error {
 	wantJson := c.Bool("json")
 	wantCsv := c.Bool("csv")
 
-	url := fmt.Sprintf("%s://%s/%s", op.Scheme, op.BaseUrl, "v1/results")
-
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	resource := "/v1/results"
+	req, err := op.NewRequest(http.MethodGet, resource, nil)
 	if err != nil {
 		return fmt.Errorf("failed to build http request")
 	}
@@ -160,7 +159,7 @@ func (op *OprClient) FetchResults(c *urfavcli.Context, domain string) error {
 	qs.Set("query", strings.Join(c.StringSlice("query"), ","))
 	req.URL.RawQuery = qs.Encode()
 
-	resp, err := op.doRequest(req)
+	resp, err := op.DoRequest(req)
 	if err != nil {
 		return fmt.Errorf("failed to fetch results")
 	}

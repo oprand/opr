@@ -4,11 +4,81 @@
 [![build](https://github.com/oprand/opr/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/oprand/opr/actions/workflows/build.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/oprand/opr)](https://goreportcard.com/report/github.com/oprand/opr)
 
-[Oprand](https://oprand.com/) provides phishing threat and domain impersonation detection services.
+The `opr` CLI tool from [oprand.com](https://oprand.com/) offers access to public and private threat data.
 
+* **Public Data:**
+  * [ASN](#asn)
+* **Private Data:**
+  * [Phishing threat and domain impersonation scan results](#private-threat-data)
+
+## Installation
+
+```
+go install github.com/oprand/opr/cmd/opr@latest
+```
+
+The `opr` binary will be installed in the directory named by the `$GOBIN` environment
+variable, which defaults to `$GOPATH/bin` or `$HOME/go/bin` if the `GOPATH`
+environment variable is not set.
+
+If you don't have `go` installed, download from our [release page](https://github.com/oprand/opr/releases).
+
+## Public Data
+
+[Oprand](https://oprand.com/) provides a free and public access to some of its in-house aggregated data.
+
+### ASN
+
+* ASN lookup: `opr asn AS3`
+* ASN lookup by IP: `opr asn 1.1.1.1`
+* ASN lookup by domain: `opr asn example.com`
+* ASN lookup by email domain: `opr asn @orange.com`
+* Your IP's ASN: `opr asn me`
+
+```bash
+# Batch queries possible:
+opr asn AS5,8.8.8.8,@google.com
+
+# Return results in JSON:
+opr asn --json example.com
+
+## Return all IPs under an ASN:
+opr asn --ip AS5
+
+## Return all CIDR under an ASN:
+opr asn --cidr AS5
+
+## Read from stdin:
+echo tesla.com | opr asn
+```
+
+Golang library usage also possible:
+```golang
+import "github.com/oprand/opr/client"
+
+opr := client.New(client.OprClientParams{})
+
+asnResponse, err := opr.GetAsn("AS3", "1.1.1.1")
+if err != nil {
+    return err
+}
+
+for _, asn := range asnResponse {
+    fmt.Printf("input:%s\n", asn.Input)
+    fmt.Printf("error:%s\n", asn.Error)
+    fmt.Printf("data:%v\n", asn.Output)
+}
+```
+
+For more information and usage see our [ASN data documentation](https://oprand.com/asn/).
+
+
+## Private Threat Data
+
+[Oprand](https://oprand.com/) provides phishing threat and domain impersonation detection services.
 We publish a public [Phishing Threat Report](https://oprand.com/report).
 
-This CLI tool helps you fetch your latest scan data.
+Access to the data below requires an Oprand account.
 
 ```
 $ opr results --query=web,ssl example.com
@@ -48,17 +118,7 @@ SSL
 # ... 100s of more results
 ```
 
-## Installation
 
-```
-go install github.com/oprand/opr/cmd/opr@latest
-```
-
-The `opr` binary will be installed in the directory named by the `$GOBIN` environment
-variable, which defaults to `$GOPATH/bin` or `$HOME/go/bin` if the `GOPATH`
-environment variable is not set.
-
-If you don't have `go` installed, download our [latest release](https://github.com/oprand/opr/releases).
 
 ## Documentation
 
@@ -71,58 +131,40 @@ If you don't have `go` installed, download our [latest release](https://github.c
 - We provide a `SHA-256` checksum for our releases
 - The tool doesn't include any auto-updating mechanism
 - Dependencies are kept to a minimum and are vetted for any security issue
-- The tool only connects to one external domain that oprand.com operates
+- The tool only connects to one external domain (oprand.com)
+- No analytics or bug report system is included - please [report manually](https://github.com/oprand/opr/issues)
 
-### How To Use Our Public Key
+### How To Use Our GPG Public Key
 
-Key signatures allow you verify the binary was indeed provided by us. Here is our release signing public key:
+Key signatures allow you verify the files were indeed provided by us. 
 
-```
------BEGIN PGP PUBLIC KEY BLOCK-----
-mDMEZCcUsRYJKwYBBAHaRw8BAQdAYrE35lXe9a5iX1A7PKrMT0f/WG2zsOZaXWsG
-3Azl/9+0H09wcmFuZCA8cmVsZWFzZS1rZXlAb3ByYW5kLmNvbT6ImQQTFgoAQRYh
-BLIWXeqG6SOaZP4kivMsieKupYdgBQJkJxSxAhsDBQkDwmcABQsJCAcCAiICBhUK
-CQgLAgQWAgMBAh4HAheAAAoJEPMsieKupYdgG4wBAJqzDeSq80+eYEHyLM5+NZAT
-bgPDj8gEpZW6PoQC7hISAQCEUGClpa8tqtR+PBfGvMm6yCOcaFZMtlaXBw+eKj2k
-B7g4BGQnFLESCisGAQQBl1UBBQEBB0A0m/8Pr4fn6XpQXAS8YTAB4ikbpudbYU4i
-+xVKM7O1DAMBCAeIfgQYFgoAJhYhBLIWXeqG6SOaZP4kivMsieKupYdgBQJkJxSx
-AhsMBQkDwmcAAAoJEPMsieKupYdgJowBAKBbq10/yaI9PNB523SsQS7JtQPa/TsI
-AG7g3mb/N7InAP46RTjbswObz5eAWhP8t2W058JHGwBSzVAgavRtXqkkAw==
-=16ZD
------END PGP PUBLIC KEY BLOCK-----
-```
-
-#### Import Our Public Key
-
-Once you saved our public key above into a file named `oprand.pub.gpg`, run this command:
-
-```
-gpg --import oprand.pub.gpg
-```
-
-You can verify it was imported successfully with `gpg --list-keys`.
+1. Download our release signing public key [here](https://oprand.com/.well-known/release-key.pub)
+2. Import it with `gpg --import oprand.pub.gpg`
+3. Verify it was imported successfully with `gpg --list-keys`
 
 #### Verify Our Releases Signature
 
-After having imported our key, and downloaded the binary `opr` and its signature file `opr.sig`, run:
+After having imported our key, download `opr.checksum.sha256.txt` and its signature `opr-checksums.sha256.txt.sig`, then run:
 
-```
-gpg --verify --default-key=B2165DEA86E9239A64FE248AF32C89E2AEA58760 opr.sig opr
+```bash
+gpg --verify --default-key=B2165DEA opr-checksums.sha256.txt.sig opr-checksums.sha256.txt
 ```
 
-A `gpg: Good signature` message should be displayed with other information.
+A `gpg: Good signature` message should be displayed.
 
 ### How To Verify Our Releases Checksum
 
-Checksum allows you to verify the integrity of the binary you downloaded.
+Checksums allow you to verify the integrity of the file you downloaded. Ensuring the file hasn't been modified in transit between Github and your system.
 
-Download the `opr.sha256` file associated with the release. Then from the same folder as the `opr` binary, run:
+Download the `opr.checksum.sha256.txt` file associated with the release. Then from the same folder as your binary's `.zip` file, run:
 
+```bash
+# The `--ignore-missing` flag ensures it won't check missing files. 
+sha256sum --check --ignore-missing opr.checksum.sha256.txt
 ```
-sha256sum --check opr.checksum
-```
 
-You should see `opr: OK` on the screen.
+You should see `OK` on the same line as your binary's `.zip` file.
+
 
 ## License
 

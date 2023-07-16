@@ -1,4 +1,4 @@
-package cli
+package client
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ import (
 const CONFIG_PATH = ".config/oprand/"
 const CONFIG_FILE = "credentials.toml"
 
-type Config struct {
+type Credentials struct {
 	Apikey    string `toml:"apikey"`
 	Apisecret string `toml:"apisecret"`
 }
@@ -21,7 +21,7 @@ type Config struct {
 // when needed to authenticate network requests.
 func (op *OprClient) SetupConfig() error {
 
-	var config Config
+	var config Credentials
 
 	// Create config path if it doesn't exist, with read for user only
 	fullPath := fmt.Sprintf("%s/%s", os.Getenv("HOME"), CONFIG_PATH)

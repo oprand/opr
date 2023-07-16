@@ -1,4 +1,4 @@
-package cli
+package client
 
 import (
 	"encoding/json"
@@ -27,9 +27,9 @@ func (op *OprClient) FetchDomains(c *cli.Context) error {
 	wantJson := c.Bool("json")
 	wantCsv := c.Bool("csv")
 
-	url := fmt.Sprintf("%s://%s/%s", op.Scheme, op.BaseUrl, "v1/domains")
+	resource := "/v1/domains"
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := op.NewRequest(http.MethodGet, resource, nil)
 	if err != nil {
 		return fmt.Errorf("failed to build http request")
 	}
@@ -44,7 +44,7 @@ func (op *OprClient) FetchDomains(c *cli.Context) error {
 	}
 	req.URL.RawQuery = qs.Encode()
 
-	resp, err := op.doRequest(req)
+	resp, err := op.DoRequest(req)
 	if err != nil {
 		return fmt.Errorf("failed to fetch domains")
 	}
