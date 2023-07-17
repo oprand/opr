@@ -11,17 +11,17 @@ builds:
     - darwin
   main: ./cmd/opr/main.go
 
+
 archives:
   - format: tar.gz
     name_template: >-
       {{ .ProjectName }}_
-      {{- if eq .Os "darwin" }}macOS
+      {{- if eq .Os "darwin" }}mac_os
       {{- else }}{{ .Os }}{{ end }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
-    # use zip for windows archives
     format_overrides:
     - goos: windows
       format: zip
@@ -30,7 +30,6 @@ checksum:
   algorithm: sha256
   name_template: 'opr-checksums.sha256.txt'
 
-# .goreleaser.yaml
 signs:
   - artifacts: checksum
     cmd: "gpg"

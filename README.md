@@ -6,10 +6,8 @@
 
 The `opr` CLI tool from [oprand.com](https://oprand.com/) offers access to public and private threat data.
 
-* **Public Data:**
-  * [ASN](#asn)
-* **Private Data:**
-  * [Phishing threat and domain impersonation scan results](#private-threat-data)
+* **Public Data:** [ASN](#asn)
+* **Private Data:** [Phishing threat and domain impersonation](#private-threat-data)
 
 ## Installation
 
@@ -58,7 +56,7 @@ import "github.com/oprand/opr/client"
 
 opr := client.New(client.OprClientParams{})
 
-asnResponse, err := opr.GetAsn("AS3", "1.1.1.1")
+asnResponse, err := opr.GetAsn("AS3", "1.1.1.1", "example.com")
 if err != nil {
     return err
 }
@@ -127,22 +125,23 @@ SSL
 ## Security
 
 - We sign all our commits
+- We produce [deterministic builds](https://en.wikipedia.org/wiki/Reproducible_builds)
 - We sign all our releases
 - We provide a `SHA-256` checksum for our releases
 - The tool doesn't include any auto-updating mechanism
 - Dependencies are kept to a minimum and are vetted for any security issue
-- The tool only connects to one external domain (oprand.com)
+- The tool only connects to one external domain (*.oprand.com)
 - No analytics or bug report system is included - please [report manually](https://github.com/oprand/opr/issues)
 
-### How To Use Our GPG Public Key
+### How to Use our GPG Public Key
 
-Key signatures allow you verify the files were indeed provided by us. 
+Signatures allow you verify the files were indeed provided by us. 
 
 1. Download our release signing public key [here](https://oprand.com/.well-known/release-key.pub)
-2. Import it with `gpg --import oprand.pub.gpg`
+2. Import it with `gpg --import release-key.pub`
 3. Verify it was imported successfully with `gpg --list-keys`
 
-#### Verify Our Releases Signature
+#### Verify our releases signature:
 
 After having imported our key, download `opr.checksum.sha256.txt` and its signature `opr-checksums.sha256.txt.sig`, then run:
 
@@ -152,7 +151,7 @@ gpg --verify --default-key=B2165DEA opr-checksums.sha256.txt.sig opr-checksums.s
 
 A `gpg: Good signature` message should be displayed.
 
-### How To Verify Our Releases Checksum
+### How to Verify our Releases Checksums
 
 Checksums allow you to verify the integrity of the file you downloaded. Ensuring the file hasn't been modified in transit between Github and your system.
 
@@ -163,7 +162,7 @@ Download the `opr.checksum.sha256.txt` file associated with the release. Then fr
 sha256sum --check --ignore-missing opr.checksum.sha256.txt
 ```
 
-You should see `OK` on the same line as your binary's `.zip` file.
+You should see `OK` on the same line as the release `.zip` file.
 
 
 ## License

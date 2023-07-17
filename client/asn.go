@@ -20,7 +20,7 @@ func (opr *OprClient) GetAsn(input ...string) (*asn.AsnResponse, error) {
 	resourcePath := strings.Join(input, ",")
 
 	headers := map[string]string{"Accept": "application/json"}
-	req, err := opr.NewRequest(http.MethodGet, resourcePath, headers)
+	req, err := opr.NewRequest(http.MethodGet, resourcePath, nil, headers)
 	if err != nil {
 		return &asnResponse, fmt.Errorf("failed to build http request")
 	}

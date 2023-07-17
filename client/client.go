@@ -50,7 +50,8 @@ func New(params OprClientParams) *OprClient {
 
 }
 
-func (c *OprClient) NewRequest(method string, resource string, headers map[string]string) (*http.Request, error) {
+// NewRequest forges a new HTTP requests, with authentication signature if required
+func (c *OprClient) NewRequest(method string, resource string, qs *url.Values, headers map[string]string) (*http.Request, error) {
 
 	url := fmt.Sprintf("%s://%s/%s", c.scheme, c.baseUrl, resource)
 	req, err := http.NewRequest(method, url, nil)
@@ -58,12 +59,14 @@ func (c *OprClient) NewRequest(method string, resource string, headers map[strin
 		return req, err
 	}
 
+	req.URL.RawQuery = qs.Encode()
+
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
 
 	// Signal who we are
-	req.Header.Add("User-Agent", c.userAgent)
+	req.Header.Set("User-Agent", c.userAgent)
 
 	if c.needAuth {
 
@@ -88,10 +91,10 @@ func (c *OprClient) NewRequest(method string, resource string, headers map[strin
 		b64DecodedSecret, _ := base64.StdEncoding.DecodeString(conf.Apisecret)
 		sig := getRequestSignature(req.URL.Path, req.URL.Query(), b64DecodedSecret)
 		// Add signature to request
-		req.Header.Add("API-Sign", sig)
+		req.Header.Set("API-Sign", sig)
 
 		// Add API Key to header
-		req.Header.Add("API-Key", conf.Apikey)
+		req.Header.Set("API-Key", conf.Apikey)
 
 	}
 
@@ -99,7 +102,7 @@ func (c *OprClient) NewRequest(method string, resource string, headers map[strin
 
 }
 
-// doRequest performs an authenticated HTTP network request.
+// DoRequest sends the `req` HTTP network request.
 func (c *OprClient) DoRequest(req *http.Request) (*[]byte, error) {
 
 	resp, err := c.httpClient.Do(req)

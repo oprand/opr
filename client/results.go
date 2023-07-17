@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"sort"
 	"strings"
@@ -135,29 +136,29 @@ func GetResultQueryUsage() string {
 func (op *OprClient) FetchResults(c *urfavcli.Context, domain string) error {
 
 	if domain == "" {
-		return fmt.Errorf("missing domain")
+		return fmt.Errorf("missing domain after command: opr results <domain>")
 	}
 
 	wantJson := c.Bool("json")
 	wantCsv := c.Bool("csv")
 
-	resource := "/v1/results"
-	req, err := op.NewRequest(http.MethodGet, resource, nil)
-	if err != nil {
-		return fmt.Errorf("failed to build http request")
-	}
+	resource := "v1/results"
 
-	qs := req.URL.Query()
+	qs := url.Values{}
 	qs.Set("domain", domain)
-	if wantJson {
-		qs.Set("format", "json")
-	} else if wantCsv {
+	if wantCsv {
 		qs.Set("format", "csv")
 	} else {
 		qs.Set("format", "json")
 	}
 	qs.Set("query", strings.Join(c.StringSlice("query"), ","))
-	req.URL.RawQuery = qs.Encode()
+
+	req, err := op.NewRequest(http.MethodGet, resource, &qs, nil)
+	if errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("credentials file needed, run `opr config` to create it")
+	} else if err != nil {
+		return fmt.Errorf("failed to build http request: %w", err)
+	}
 
 	resp, err := op.DoRequest(req)
 	if err != nil {

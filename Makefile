@@ -1,9 +1,9 @@
 .DEFAULT_GOAL := help
 
 GITHASH := $(shell git rev-parse HEAD)
-LDFLAGS := -X main.GitCommitHash=$(GITHASH)
+LDFLAGS := -X main.version=$(OPRVERSION) -X main.commit=$(GITHASH)
 
-.PHONY: help build
+.PHONY: help build install
 
 
 help: ## Show this help message

@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
+	"os"
 	"syscall"
 
 	"github.com/urfave/cli/v2"
@@ -27,26 +29,25 @@ func (op *OprClient) FetchDomains(c *cli.Context) error {
 	wantJson := c.Bool("json")
 	wantCsv := c.Bool("csv")
 
-	resource := "/v1/domains"
+	resource := "v1/domains"
 
-	req, err := op.NewRequest(http.MethodGet, resource, nil)
-	if err != nil {
-		return fmt.Errorf("failed to build http request")
-	}
-
-	qs := req.URL.Query()
-	if wantJson {
-		qs.Set("format", "json")
-	} else if wantCsv {
+	qs := url.Values{}
+	if wantCsv {
 		qs.Set("format", "csv")
 	} else {
 		qs.Set("format", "json")
 	}
-	req.URL.RawQuery = qs.Encode()
+
+	req, err := op.NewRequest(http.MethodGet, resource, &qs, nil)
+	if errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("credentials file needed, run `opr config` to create it")
+	} else if err != nil {
+		return fmt.Errorf("failed to build http request: %w", err)
+	}
 
 	resp, err := op.DoRequest(req)
 	if err != nil {
-		return fmt.Errorf("failed to fetch domains")
+		return fmt.Errorf("failed to fetch domains: %w", err)
 	}
 
 	if resp == nil {

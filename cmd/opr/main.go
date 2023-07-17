@@ -19,7 +19,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var GitCommitHash = "        "
+var (
+	version = "dev"
+	commit  = "********"
+)
 
 // parseFlagsAndArgs checks if any args is actually a flag (expect the first, assume it's actual input)
 // If that's the case, try to convert it to the corresponding flag or return error.
@@ -74,9 +77,9 @@ func parseFlagsAndArgs(c *cli.Context) ([]string, error) {
 func run(args []string, stdout io.Writer) error {
 
 	cliapp := cli.NewApp()
-	cliapp.Name = "OPRAND CLI"
+	cliapp.Name = "OPRAND CLI tool"
 	cliapp.Usage = "CLI tool to access Oprand data"
-	cliapp.Version = fmt.Sprintf("v0.0.2 - Commit: %s", strings.ToUpper(GitCommitHash[:8]))
+	cliapp.Version = fmt.Sprintf("%s - Commit: %s", version, strings.ToUpper(commit[:8]))
 	cliapp.EnableBashCompletion = true
 	cliapp.UsageText = "opr [global flags] <command> [command flags] [example.com | ASN | IP]"
 	cliapp.CustomAppHelpTemplate = getAppHelpText()
@@ -300,7 +303,7 @@ func getAppHelpText() string {
      --help, -h     show help
      --version, -v  print the version
 ──────────────────────────────────────────────────────────────────────
- {{Bold "VERSION"}}  v0.0.2 - Commit: {{.CommitHash}}
+ {{Bold "VERSION"}}  {{.Version}} - Commit: {{trunc 8 (upper .CommitHash)}}
  {{Bold "LICENSE"}}  GPL-3.0
 ──────────────────────────────────────────────────────────────────────
  {{Bold "DISCLAIMER"}}
@@ -320,8 +323,10 @@ func getAppHelpText() string {
 	err = tmpl.Execute(&buff,
 		struct {
 			CommitHash string
+			Version    string
 		}{
-			CommitHash: GitCommitHash,
+			CommitHash: commit,
+			Version:    version,
 		},
 	)
 	if err != nil {
