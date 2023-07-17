@@ -54,7 +54,10 @@ func parseFlagsAndArgs(c *cli.Context) ([]string, error) {
 				noHyphenFlag := strings.TrimLeft(arg, "-")
 				for _, flagName := range flag.Names() {
 					if noHyphenFlag == flagName {
-						c.Set(noHyphenFlag, "true")
+						err := c.Set(noHyphenFlag, "true")
+						if err != nil {
+							return input, fmt.Errorf("error setting flag: %w", err)
+						}
 						break flag_loop
 					}
 					if i+1 == len(c.Command.Flags) {
