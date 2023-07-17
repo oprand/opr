@@ -250,8 +250,8 @@ func run(args []string, stdout io.Writer) error {
 	sort.Sort(cli.CommandsByName(cliapp.Commands))
 
 	// Silent broken pipe errors.
-	// 	   SIGPIPE is sent to a proccess when it writes on a pipe with that has no reader.
-	// 	   In our case the writting process is our CLI tool writing to stdout.
+	// 	   SIGPIPE is sent to a process when it writes on a pipe with that has no reader.
+	// 	   In our case the writing process is our CLI tool writing to stdout.
 	//     When piping its output to another programm that will stop reading
 	//     after some bytes (for instance `| head`), SIGPIPE will be sent to our CLI tool.
 	//	   This is a normal operation and not an error per se.
