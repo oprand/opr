@@ -59,7 +59,9 @@ func (c *OprClient) NewRequest(method string, resource string, qs *url.Values, h
 		return req, err
 	}
 
-	req.URL.RawQuery = qs.Encode()
+	if qs != nil {
+		req.URL.RawQuery = qs.Encode()
+	}
 
 	for k, v := range headers {
 		req.Header.Set(k, v)
