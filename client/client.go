@@ -113,6 +113,10 @@ func (c *OprClient) DoRequest(req *http.Request) (*[]byte, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusTooManyRequests {
+		return nil, fmt.Errorf("too many requests, try again in 30 sec")
+	}
+
 	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err

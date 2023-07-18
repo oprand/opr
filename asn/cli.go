@@ -97,8 +97,8 @@ func CliHandler(response *AsnResponse, c *cli.Context) error {
 					return err
 				}
 				return nil
-			} else {
-				_, err := fmt.Print(strings.Join(out, "\n"))
+			} else if len(out) > 0 {
+				_, err := fmt.Print(strings.Join(out, "\n") + "\n")
 				if errors.Is(err, syscall.EPIPE) {
 					return nil
 				} else if err != nil {
