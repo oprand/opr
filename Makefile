@@ -1,7 +1,8 @@
 .DEFAULT_GOAL := help
 
 GITHASH := $(shell git rev-parse HEAD)
-LDFLAGS := -X main.version=$(OPRVERSION) -X main.commit=$(GITHASH)
+VERSION := $(shell git describe --tags | tr -d 'v')
+LDFLAGS := -s -w -X main.version=$(VERSION) -X main.commit=$(GITHASH)
 
 .PHONY: help build install
 
@@ -12,7 +13,7 @@ help: ## Show this help message
 
 
 build: ## Build `opr` binary for local env (os/arch)
-	go build -o ./bin/opr -ldflags "$(LDFLAGS)" ./cmd/opr/...
+	CGO_ENABLED=0 go build -o ./bin/opr -ldflags "$(LDFLAGS)" ./cmd/opr/main.go
 
 
 install: ## Install `opr` binary under `/usr/local/bin/`

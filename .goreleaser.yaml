@@ -10,6 +10,8 @@ builds:
     - windows
     - darwin
   main: ./cmd/opr/main.go
+  ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}}
 
 
 archives:
