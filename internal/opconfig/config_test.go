@@ -211,16 +211,16 @@ func TestUnknownKeyIsError(t *testing.T) {
 func TestSecretKeysAreErrors(t *testing.T) {
 	t.Parallel()
 	cases := map[string]string{
-		"dsn = \"postgresql://x\"\n":                      EnvDSN,
-		"[clickhouse]\npassword = \"x\"\n":                EnvClickHousePassword,
-		"[clickhouse]\nclickhouse-password = \"x\"\n":     EnvClickHousePassword,
-		"[peeringdb]\napikey = \"x\"\n":                   EnvPeeringDBAPIKey,
-		"[fdns.ingest-cc]\npassword = \"x\"\n":            EnvClickHousePassword,
+		"dsn = \"postgresql://x\"\n":                                                    EnvDSN,
+		"[clickhouse]\npassword = \"x\"\n":                                              EnvClickHousePassword,
+		"[clickhouse]\nclickhouse-password = \"x\"\n":                                   EnvClickHousePassword,
+		"[peeringdb]\napikey = \"x\"\n":                                                 EnvPeeringDBAPIKey,
+		"[fdns.ingest-cc]\npassword = \"x\"\n":                                          EnvClickHousePassword,
 		"[registry-crawl.worker]\nenabled = true\n[registry-crawl.seed]\ndsn = \"x\"\n": EnvDSN,
-		"[registry-crawl.bulk]\nPassword = \"x\"\n":       EnvClickHousePassword,
-		"[[proxies]]\napikey = \"x\"\n":                   EnvPeeringDBAPIKey,
-		"[clickhouse]\nnested = { password = \"x\" }\n":   EnvClickHousePassword,
-		"[fdns]\n[fdns.resolve]\ndsn = \"postgresql://\"": EnvDSN,
+		"[registry-crawl.bulk]\nPassword = \"x\"\n":                                     EnvClickHousePassword,
+		"[[proxies]]\napikey = \"x\"\n":                                                 EnvPeeringDBAPIKey,
+		"[clickhouse]\nnested = { password = \"x\" }\n":                                 EnvClickHousePassword,
+		"[fdns]\n[fdns.resolve]\ndsn = \"postgresql://\"":                               EnvDSN,
 	}
 	for src, env := range cases {
 		_, err := Parse([]byte(src))
