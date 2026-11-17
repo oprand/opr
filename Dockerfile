@@ -1,4 +1,4 @@
-# opr network data gathering CLI.
+# opr network data aggregator CLI.
 #
 # This image has no default Postgres DSN, no config file, and no API keys.
 # One-shots take --dsn (or OPR_DSN). The daemon takes only --config and

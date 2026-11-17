@@ -4,6 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"os/signal"
+	"slices"
+	"strings"
+	"sync"
+	"syscall"
+	"time"
+
 	"github.com/oprand/opr/aggregator/asnames"
 	"github.com/oprand/opr/aggregator/aspop"
 	"github.com/oprand/opr/aggregator/geonames"
@@ -16,13 +24,6 @@ import (
 	"github.com/oprand/opr/internal/oplog"
 	"github.com/oprand/opr/internal/version"
 	"github.com/oprand/opr/store/postgres"
-	"os"
-	"os/signal"
-	"slices"
-	"strings"
-	"sync"
-	"syscall"
-	"time"
 
 	"github.com/urfave/cli/v2"
 	"go.uber.org/automaxprocs/maxprocs"
@@ -40,12 +41,17 @@ const (
 // urfave/cli v2.27 prints Command.Category in `opr help`, and on a leaf
 // command, but the subcommand template skips it. This is that template with
 // the same CATEGORY block the leaf template uses, so `opr postgres --help`
-// shows MANAGEMENT.
+// shows MANAGEMENT. Nested help uses "subcommand" (not "command") so
+// `opr geoip ipmap` reads as a subcommand of geoip.
+//
+// USAGE prefers Command.UsageText (set by applyHelpUsageTexts) so every
+// line includes [global options]. The else branch is a safety net for
+// auto-registered help commands that never get UsageText.
 const subcommandHelpTemplate = `NAME:
    {{template "helpNameTemplate" .}}
 
 USAGE:
-   {{if .UsageText}}{{wrap .UsageText 3}}{{else}}{{.HelpName}} {{if .VisibleFlags}}command [command options]{{end}}{{if .ArgsUsage}} {{.ArgsUsage}}{{else}}{{if .Args}} [arguments...]{{end}}{{end}}{{end}}{{if .Category}}
+   {{if .UsageText}}{{wrap .UsageText 3}}{{else}}opr [global options] {{.Name}}{{if .VisibleCommands}} [subcommand]{{end}} [options]{{end}}{{if .Category}}
 
 CATEGORY:
    {{.Category}}{{end}}{{if .Description}}
@@ -53,7 +59,26 @@ CATEGORY:
 DESCRIPTION:
    {{template "descriptionTemplate" .}}{{end}}{{if .VisibleCommands}}
 
-COMMANDS:{{template "visibleCommandCategoryTemplate" .}}{{end}}{{if .VisibleFlagCategories}}
+SUBCOMMANDS:{{template "visibleCommandCategoryTemplate" .}}{{end}}{{if .VisibleFlagCategories}}
+
+OPTIONS:{{template "visibleFlagCategoryTemplate" .}}{{else if .VisibleFlags}}
+
+OPTIONS:{{template "visibleFlagTemplate" .}}{{end}}
+`
+
+// commandHelpTemplate is the leaf-command template with the same
+// [global options] USAGE preference as parent (subcommand) help.
+const commandHelpTemplate = `NAME:
+   {{template "helpNameTemplate" .}}
+
+USAGE:
+   {{if .UsageText}}{{wrap .UsageText 3}}{{else}}opr [global options] {{.Name}} [options]{{end}}{{if .Category}}
+
+CATEGORY:
+   {{.Category}}{{end}}{{if .Description}}
+
+DESCRIPTION:
+   {{template "descriptionTemplate" .}}{{end}}{{if .VisibleFlagCategories}}
 
 OPTIONS:{{template "visibleFlagCategoryTemplate" .}}{{else if .VisibleFlags}}
 
@@ -62,7 +87,28 @@ OPTIONS:{{template "visibleFlagTemplate" .}}{{end}}
 
 func init() {
 	cli.SubcommandHelpTemplate = subcommandHelpTemplate
+	cli.CommandHelpTemplate = commandHelpTemplate
 	maxprocs.Set(maxprocs.Logger(func(string, ...interface{}) {}))
+}
+
+// applyHelpUsageTexts sets UsageText on every registered command so printed
+// USAGE matches root help: `opr [global options] <command> [subcommand] [options]`.
+// Second-level slots are labeled "subcommand". ArgsUsage (e.g. help's
+// [command]) wins over the generic [options] suffix when set.
+func applyHelpUsageTexts(cmds []*cli.Command, trail []string) {
+	for _, cmd := range cmds {
+		path := append(append([]string(nil), trail...), cmd.Name)
+		rest := strings.Join(path, " ")
+		switch {
+		case strings.TrimSpace(cmd.ArgsUsage) != "":
+			cmd.UsageText = "opr [global options] " + rest + " " + strings.TrimSpace(cmd.ArgsUsage)
+		case len(cmd.Subcommands) > 0:
+			cmd.UsageText = "opr [global options] " + rest + " [subcommand] [options]"
+		default:
+			cmd.UsageText = "opr [global options] " + rest + " [options]"
+		}
+		applyHelpUsageTexts(cmd.Subcommands, path)
+	}
 }
 
 // oprHelpCommand is a local copy of urfave/cli's default help command.
@@ -109,7 +155,7 @@ func run() error {
 func newCLIApp() *cli.App {
 	cliapp := cli.NewApp()
 	cliapp.Name = "opr"
-	cliapp.Usage = "opr network data gathering"
+	cliapp.Usage = "opr network data aggregator"
 	cliapp.Version = fmt.Sprintf("0.0.1 - Commit: %s", version.GitCommitHash)
 	cliapp.EnableBashCompletion = true
 
@@ -132,12 +178,12 @@ func newCLIApp() *cli.App {
 	fetchRegistriesDataFlags := []cli.Flag{
 		&cli.BoolFlag{
 			Name:  "rdap-ipnet",
-			Usage: "Start crawl_target ipnet RDAP workers (same process as autnum; share that RIR's AdaptiveLimiter). --kind is the selector and this flag appends ipnet if missing. Not IRR route objects (that is bulk --with-whoisdb-route-fetch). In opr run this is rdap.ipnet",
+			Usage: "Start crawl_target ipnet RDAP workers (same process as autnum; share that RIR's AdaptiveLimiter). --kind is the selector and this flag appends ipnet if missing. Not IRR route objects (that is bulk --with-whoisdb-route-fetch). In opr run this is registry-crawl.worker.ipnet",
 			Value: false,
 		},
 		&cli.BoolFlag{
 			Name:  "rdap-autnum",
-			Usage: "Start crawl_target autnum RDAP workers. --kind is the selector and this flag appends autnum if missing. In opr run this is rdap.enabled",
+			Usage: "Start crawl_target autnum RDAP workers. --kind is the selector and this flag appends autnum if missing. In opr run this is registry-crawl.worker.enabled",
 			Value: false,
 		},
 		&cli.StringSliceFlag{
@@ -258,12 +304,13 @@ Jobs: rdap (autnum + ipnet queue workers), seed, whoisdb, geonames, peeringdb, a
 	}
 
 	syncPeeringDb := cli.Command{
-		Name:     "peeringdb",
-		Aliases:  []string{"pdb"},
-		Category: commandCategoryData,
-		Usage:    "Download official PeeringDB JSON dumps and COPY-swap peeringdb_* tables. Subcommand status is a read-only board.",
-		Flags:    syncPeeringdbFlags,
-		Action:   runPeeringDBIngest,
+		Name:        "peeringdb",
+		Aliases:     []string{"pdb"},
+		Category:    commandCategoryData,
+		Usage:       "Download official PeeringDB JSON dumps and COPY-swap peeringdb_* tables. Needs Postgres (--apikey or OPR_PEERINGDB_APIKEY).",
+		Description: "Bare peeringdb ingests. Subcommand status is a read-only board (no downloads).",
+		Flags:       syncPeeringdbFlags,
+		Action:      runPeeringDBIngest,
 		Subcommands: []*cli.Command{
 			peeringdbStatusCommand(),
 		},
@@ -283,11 +330,12 @@ Jobs: rdap (autnum + ipnet queue workers), seed, whoisdb, geonames, peeringdb, a
 	)
 
 	geonamesCommand := cli.Command{
-		Name:     "geonames",
-		Aliases:  []string{"gn"},
-		Category: commandCategoryData,
-		Usage:    "Download GeoNames dumps, COPY-swap split tables, and rebuild geonames_lookup. Subcommands status and flags are read-only boards.",
-		Action:   runGeoNamesIngest,
+		Name:        "geonames",
+		Aliases:     []string{"gn"},
+		Category:    commandCategoryData,
+		Usage:       "Download GeoNames dumps, COPY-swap split tables, and rebuild geonames_lookup. Needs Postgres.",
+		Description: "Bare geonames ingests. Subcommands status and flags are read-only boards (no downloads).",
+		Action:      runGeoNamesIngest,
 		Subcommands: []*cli.Command{
 			geonamesStatusCommand(),
 			geonamesFlagsCommand(),
@@ -295,25 +343,26 @@ Jobs: rdap (autnum + ipnet queue workers), seed, whoisdb, geonames, peeringdb, a
 	}
 
 	registryCrawlCommand := cli.Command{
-		Name:     "registry-crawl",
-		Category: commandCategoryData,
-		Usage:    "Seed, ingest bulk whois dumps, and run the durable RDAP crawl queue (crawl_target)",
+		Name:        "registry-crawl",
+		Category:    commandCategoryData,
+		Usage:       "Seed crawl_target, ingest bulk whois dumps, and run the durable RDAP queue. Needs Postgres.",
+		Description: "Typical order: seed → bulk → worker. status is read-only. Subcommand details are under each name.",
 		Subcommands: []*cli.Command{
 			{
 				Name:   "bulk",
-				Usage:  "Fetch bulk whois dumps from each RIR/NIR plus route objects from every IRR (including the ARIN and AFRINIC mixed dumps), save them, and mark RIPE/APNIC/AFRINIC/NIR autnums and inetnums covered in crawl_target so RDAP skips them. Coverage is reconciled at the end of every run, so ETag-skipped files still count. Then backfill as_name/country from RIPE asnames.txt for still-pending autnums (not a coverage mark). ARIN/LACNIC dumps are still saved but never marked (incomplete).",
+				Usage:  "Fetch bulk whois dumps from each RIR/NIR plus route objects from every IRR (including the ARIN and AFRINIC mixed dumps), save them, and mark RIPE/APNIC/AFRINIC/NIR autnums and inetnums covered in crawl_target so RDAP skips them. Coverage is reconciled at the end of every run, so ETag-skipped files still count. Then backfill as_name/country from RIPE asnames.txt for still-pending autnums (not a coverage mark). ARIN/LACNIC dumps are still saved but never marked (incomplete). In opr run this is the periodic [registry-crawl.bulk] job.",
 				Flags:  whoisdbFlags,
 				Action: runWhoisDBAggregation,
 			},
 			{
 				Name:   "worker",
-				Usage:  "Claim crawl_target autnum and/or ipnet rows and fetch them via RDAP (--kind autnum|ipnet, omit for both). Defaults to ARIN+LACNIC because RIPE/APNIC/AFRINIC are bulk-covered (already done). --include-bulk-gaps claims leftover pending on other RIRs. --only-registries wins.",
+				Usage:  "Claim crawl_target autnum and/or ipnet rows and fetch them via RDAP (--kind autnum|ipnet, omit for both). Defaults to ARIN+LACNIC because RIPE/APNIC/AFRINIC are bulk-covered (already done). --include-bulk-gaps claims leftover pending on other RIRs. --only-registries wins. In opr run this is the continuous [registry-crawl.worker] job.",
 				Flags:  rdapWorkerFlags,
 				Action: runRDAPRegistryWorker,
 			},
 			{
 				Name:  "seed",
-				Usage: "Refresh NRO delegated-stats, then enqueue crawl_target from that snapshot (one pending autnum job per allocated/assigned ASN, one pending ipnet job per canonical CIDR of the ARIN/LACNIC delegated ranges) plus the ARIN/LACNIC prefixes announced in RouteViews RIBs. Enqueue only: downloads no whois dumps and writes no prefix data.",
+				Usage: "Refresh NRO delegated-stats, then enqueue crawl_target from that snapshot (one pending autnum job per allocated/assigned ASN, one pending ipnet job per canonical CIDR of the ARIN/LACNIC delegated ranges) plus the ARIN/LACNIC prefixes announced in RouteViews RIBs. Enqueue only: downloads no whois dumps and writes no prefix data. In opr run this is the periodic [registry-crawl.seed] job.",
 				Flags: append([]cli.Flag{
 					&cli.StringSliceFlag{
 						Name:  "only-registries",
@@ -376,6 +425,7 @@ Jobs: rdap (autnum + ipnet queue workers), seed, whoisdb, geonames, peeringdb, a
 		&geonamesCommand,
 		&registryCrawlCommand,
 	}
+	applyHelpUsageTexts(cliapp.Commands, nil)
 
 	return cliapp
 
@@ -537,11 +587,12 @@ func runRegistryCrawlSeed(c *cli.Context) error {
 }
 
 // seedOptions are the knobs of `registry-crawl seed` and the daemon's
-// [seed] job.
+// [registry-crawl.seed] job.
 type seedOptions struct {
 	// Registries is --only-registries / empty for all five.
 	Registries []string
-	// SkipRIBs skips the RouteViews RIB pass (--skip-ribs / seed.skip-ribs).
+	// SkipRIBs skips the RouteViews RIB pass (--skip-ribs /
+	// registry-crawl.seed.skip-ribs).
 	SkipRIBs bool
 	// DelegatedStatsURL is the NRO snapshot source.
 	DelegatedStatsURL string

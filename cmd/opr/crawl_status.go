@@ -20,7 +20,7 @@ import (
 func registryCrawlStatusCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "status",
-		Usage: "Print a read-only status board for NRO, bulk dumps, RIB/asnames watermarks, coverage, and the RDAP queue",
+		Usage: "Print a read-only status board for NRO, bulk dumps, RIB/asnames watermarks, coverage, and the RDAP queue. No downloads. Needs Postgres.",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:  "json",

@@ -19,16 +19,12 @@ func clickhouseCommand() *cli.Command {
 	return &cli.Command{
 		Name:     "clickhouse",
 		Category: commandCategoryManagement,
-		Usage:    "Management command that only touches the ClickHouse schema (fdns_cc_host and friends). Never runs implicitly.",
-		Description: `Management command that only touches the ClickHouse schema that holds the Common Crawl Host Index. It does not ingest.
+		Usage:    "Management command for the ClickHouse schema (fdns_cc_host and friends). Never runs implicitly.",
+		Description: `Touches only the ClickHouse schema for the Common Crawl Host Index. It does not ingest.
 
-Unlike the Postgres migrations, which every command runs on startup, these are explicit: ClickHouse has no transactional DDL and reshaping a large MergeTree is a maintenance operation, not something to do at process start. fdns ingest-cc and fdns seed-queue only assert the version and tell you to run migrate.
+Unlike Postgres migrations (every command on startup), these are explicit: no transactional DDL, and reshaping a large MergeTree is maintenance. fdns ingest-cc and fdns seed-queue only assert the version and tell you to run migrate.
 
-Subcommands:
-  migrate  Apply pending migrations in version order. --dry-run prints the pending versions instead.
-  version  Print the applied schema version, its dirty flag, and the version this binary expects.
-
-Bare "opr clickhouse" prints this help.`,
+When: before first ingest-cc / seed-queue, and after upgrading this binary. No --dsn.`,
 		Subcommands: []*cli.Command{
 			{
 				Name:   "migrate",

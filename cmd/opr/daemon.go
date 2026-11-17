@@ -172,17 +172,17 @@ func (dm *Daemon) DoAggregationForever() error {
 		}()
 	}
 
-	start("rdap", cfg.RDAP.Enabled || cfg.RDAP.Ipnet, dm.runRDAP)
-	start("seed", cfg.Seed.Enabled, dm.runSeed)
-	start("whoisdb", cfg.WhoisDB.Enabled, dm.runWhoisDB)
+	start("registry-crawl.worker", cfg.RegistryCrawl.Worker.Enabled || cfg.RegistryCrawl.Worker.Ipnet, dm.runRDAP)
+	start("registry-crawl.seed", cfg.RegistryCrawl.Seed.Enabled, dm.runSeed)
+	start("registry-crawl.bulk", cfg.RegistryCrawl.Bulk.Enabled, dm.runWhoisDB)
 	start("geonames", cfg.GeoNames.Enabled, dm.runGeoNames)
 	start("peeringdb", cfg.PeeringDB.Enabled, dm.runPeeringDB)
 	start("aspop", cfg.ASPop.Enabled, dm.runASPop)
-	start("geoip.lacnic", cfg.GeoIP.Enabled, dm.runGeoIPLacnic)
-	start("geoip.ipmap", cfg.GeoIP.Enabled, dm.runGeoIPIPMap)
-	start("geoip.anycast", cfg.GeoIP.Enabled, dm.runGeoIPAnycast)
-	start("geoip.geofeeds", cfg.GeoIP.Enabled, dm.runGeoIPGeofeeds)
-	start("rpki", cfg.RPKI.Enabled, dm.runRPKI)
+	start("geoip.lacnic", cfg.GeoIP.Lacnic.Enabled, dm.runGeoIPLacnic)
+	start("geoip.ipmap", cfg.GeoIP.IPMap.Enabled, dm.runGeoIPIPMap)
+	start("geoip.anycast", cfg.GeoIP.Anycast.Enabled, dm.runGeoIPAnycast)
+	start("geoip.crawl-geofeeds", cfg.GeoIP.CrawlGeofeeds.Enabled, dm.runGeoIPGeofeeds)
+	start("rpki.ingest", cfg.RPKI.Ingest.Enabled, dm.runRPKI)
 	start("fdns.ingest-lists", cfg.FDNS.IngestLists.Enabled, dm.runFDNSIngestLists)
 	start("fdns.resolve", cfg.FDNS.Resolve.Enabled, dm.runFDNSResolve)
 	start("fdns.ingest-cc", cfg.FDNS.IngestCC.Enabled, dm.runFDNSIngestCC)
@@ -279,7 +279,7 @@ func runPeriodic(ctx context.Context, logger *zap.Logger, interval time.Duration
 }
 
 // runQueue runs a queue worker until ctx is cancelled. The workers here
-// (fdns resolve, rdns crawl-ptr, geofeeds, rdap StartCrawlWorkers) return
+// (fdns resolve, rdns crawl-ptr, geofeeds, registry-crawl worker) return
 // when their queue drains or on error, so this restarts them after idle.
 func runQueue(ctx context.Context, logger *zap.Logger, idle time.Duration, job func(ctx context.Context) error) {
 	for {
@@ -303,12 +303,12 @@ func runQueue(ctx context.Context, logger *zap.Logger, idle time.Duration, job f
 	}
 }
 
-// runRDAP is [rdap]: StartCrawlWorkers for autnum (rdap.enabled) and ipnet
-// (rdap.ipnet). The workers themselves loop claim → process → idle until
-// cancel.
+// runRDAP is [registry-crawl.worker]: StartCrawlWorkers for autnum
+// (enabled) and ipnet. The workers themselves loop claim → process → idle
+// until cancel.
 func (dm *Daemon) runRDAP(ctx context.Context, logger *zap.Logger, st *postgres.Store) {
-	rc := dm.cfg.RDAP
-	kinds := crawlKindsFromConfig(rc)
+	wc := dm.cfg.RegistryCrawl.Worker
+	kinds := crawlKindsFromConfig(wc)
 	if len(kinds) == 0 {
 		return
 	}
@@ -320,8 +320,8 @@ func (dm *Daemon) runRDAP(ctx context.Context, logger *zap.Logger, st *postgres.
 		}
 		var err error
 		aggr, err = registry.New(logger, st, registry.Options{
-			OnlyRegistries: rc.OnlyRegistries,
-			Proxies:        rc.Proxies,
+			OnlyRegistries: wc.OnlyRegistries,
+			Proxies:        wc.Proxies,
 		})
 		if err == nil {
 			break
@@ -333,36 +333,38 @@ func (dm *Daemon) runRDAP(ctx context.Context, logger *zap.Logger, st *postgres.
 		case <-time.After(queueIdle):
 		}
 	}
-	aggr.ApplyRDAPWorkerRegistryDefaults(rc.OnlyRegistries, rc.IncludeBulkGaps)
+	aggr.ApplyRDAPWorkerRegistryDefaults(wc.OnlyRegistries, wc.IncludeBulkGaps)
 
 	crawlCfg := registry.CrawlConfig{
-		Lease: rc.Lease.Std(),
-		Batch: rc.Batch,
+		Lease: wc.Lease.Std(),
+		Batch: wc.Batch,
 		Once:  false,
 	}
-	logger.Info("starting rdap crawl workers (durable queue, Once=false)", zap.Strings("kinds", kinds))
+	logger.Info("starting registry-crawl worker (durable queue, Once=false)", zap.Strings("kinds", kinds))
 	runQueue(ctx, logger, queueIdle, func(ctx context.Context) error {
 		return aggr.StartCrawlWorkers(ctx, kinds, crawlCfg)
 	})
 }
 
-// crawlKindsFromConfig maps [rdap] onto StartCrawlWorkers kinds: enabled
-// starts autnum, ipnet starts ipnet. Both share each RIR's AdaptiveLimiter.
-func crawlKindsFromConfig(rc opconfig.RDAP) []string {
+// crawlKindsFromConfig maps [registry-crawl.worker] onto StartCrawlWorkers
+// kinds: enabled starts autnum, ipnet starts ipnet. Both share each RIR's
+// AdaptiveLimiter.
+func crawlKindsFromConfig(wc opconfig.RegistryCrawlWorker) []string {
 	var kinds []string
-	if rc.Enabled {
+	if wc.Enabled {
 		kinds = append(kinds, postgres.CrawlKindAutnum)
 	}
-	if rc.Ipnet {
+	if wc.Ipnet {
 		kinds = append(kinds, postgres.CrawlKindIpnet)
 	}
 	return kinds
 }
 
-// runSeed is [seed]: the same path as `registry-crawl seed` (NRO refresh,
-// autnum + ipnet SQL seeds, RouteViews RIBs unless skip-ribs) on interval.
+// runSeed is [registry-crawl.seed]: the same path as `registry-crawl seed`
+// (NRO refresh, autnum + ipnet SQL seeds, RouteViews RIBs unless skip-ribs)
+// on interval.
 func (dm *Daemon) runSeed(ctx context.Context, logger *zap.Logger, st *postgres.Store) {
-	sc := dm.cfg.Seed
+	sc := dm.cfg.RegistryCrawl.Seed
 
 	opts := seedOptions{
 		Registries:        sc.OnlyRegistries, // empty = all five
@@ -387,24 +389,24 @@ func waitForWhoisSaver(logger *zap.Logger, aggr *whoisdb.WhoisDBAggregator) {
 	}
 }
 
-// runWhoisDB is [whoisdb]: DoWhoisDBAggregationOnce every period. The
-// record saver goroutine lives for the whole loop; Close ends it.
+// runWhoisDB is [registry-crawl.bulk]: DoWhoisDBAggregationOnce every
+// period. The record saver goroutine lives for the whole loop; Close ends it.
 func (dm *Daemon) runWhoisDB(ctx context.Context, logger *zap.Logger, st *postgres.Store) {
-	wc := dm.cfg.WhoisDB
+	bc := dm.cfg.RegistryCrawl.Bulk
 
 	aggr := whoisdb.New(logger, st, whoisdb.Options{
-		Period:           wc.Period.Std(),
-		BufferMaxSize:    wc.BufferMaxSize,
-		WithRouteObjects: wc.WithRouteObjects,
-		PrefetchDepth:    wc.Prefetch,
-		AsNamesURL:       wc.AsnamesURL,
+		Period:           bc.Period.Std(),
+		BufferMaxSize:    bc.BufferMaxSize,
+		WithRouteObjects: bc.WithRouteObjects,
+		PrefetchDepth:    bc.Prefetch,
+		AsNamesURL:       bc.AsnamesURL,
 	})
 	go aggr.SaveWhoisRecords()
 	defer waitForWhoisSaver(logger, aggr)
 
-	runPeriodic(ctx, logger, wc.Period.Std(), func(ctx context.Context) error {
+	runPeriodic(ctx, logger, bc.Period.Std(), func(ctx context.Context) error {
 		err := aggr.DoWhoisDBAggregationOnce(ctx)
-		aggr.StatusMetadata.NextFetchTime = time.Now().Add(wc.Period.Std())
+		aggr.StatusMetadata.NextFetchTime = time.Now().Add(bc.Period.Std())
 		return err
 	})
 }
@@ -447,20 +449,20 @@ func (dm *Daemon) runASPop(ctx context.Context, logger *zap.Logger, st *postgres
 	})
 }
 
-// runGeoIPLacnic is [geoip] lacnic-interval: the LACNIC inetnum CSV.
+// runGeoIPLacnic is [geoip.lacnic]: the LACNIC inetnum CSV on interval.
 func (dm *Daemon) runGeoIPLacnic(ctx context.Context, logger *zap.Logger, st *postgres.Store) {
 	gi := geoip.New(logger, st)
-	runPeriodic(ctx, logger, dm.cfg.GeoIP.LacnicInterval.Std(), func(ctx context.Context) error {
+	runPeriodic(ctx, logger, dm.cfg.GeoIP.Lacnic.Interval.Std(), func(ctx context.Context) error {
 		return gi.FetchIpGeolocationFromLacnic(ctx)
 	})
 }
 
-// runGeoIPIPMap is [geoip] ipmap-interval: the RIPE IPmap dump. An empty
+// runGeoIPIPMap is [geoip.ipmap]: the RIPE IPmap dump on interval. An empty
 // dump keeps the previous rows and is not an error.
 func (dm *Daemon) runGeoIPIPMap(ctx context.Context, logger *zap.Logger, st *postgres.Store) {
 	gi := geoip.New(logger, st)
-	runPeriodic(ctx, logger, dm.cfg.GeoIP.IPMapInterval.Std(), func(ctx context.Context) error {
-		err := gi.FetchIPMAP(ctx, dm.cfg.GeoIP.IPMapForce, geoip.IPMAPDumpURL)
+	runPeriodic(ctx, logger, dm.cfg.GeoIP.IPMap.Interval.Std(), func(ctx context.Context) error {
+		err := gi.FetchIPMAP(ctx, dm.cfg.GeoIP.IPMap.Force, geoip.IPMAPDumpURL)
 		if errors.Is(err, geoip.ErrIPMAPEmpty) {
 			logger.Warn("ripe ipmap dump had no valid prefixes; previous rows kept", zap.Error(err))
 			return nil
@@ -469,19 +471,19 @@ func (dm *Daemon) runGeoIPIPMap(ctx context.Context, logger *zap.Logger, st *pos
 	})
 }
 
-// runGeoIPAnycast is [geoip] anycast-interval: bgptools anycatch CSVs.
+// runGeoIPAnycast is [geoip.anycast]: bgptools anycatch CSVs on interval.
 func (dm *Daemon) runGeoIPAnycast(ctx context.Context, logger *zap.Logger, st *postgres.Store) {
 	gi := geoip.New(logger, st)
-	runPeriodic(ctx, logger, dm.cfg.GeoIP.AnycastInterval.Std(), func(ctx context.Context) error {
-		return gi.FetchAnycast(ctx, dm.cfg.GeoIP.AnycastForce)
+	runPeriodic(ctx, logger, dm.cfg.GeoIP.Anycast.Interval.Std(), func(ctx context.Context) error {
+		return gi.FetchAnycast(ctx, dm.cfg.GeoIP.Anycast.Force)
 	})
 }
 
-// runGeoIPGeofeeds is [geoip] worker-count / geofeed-refresh-older-than:
-// geofeeds.Crawler with Once=false. Run drains the due URLs and returns,
-// so it is restarted after geofeedIdle until cancel.
+// runGeoIPGeofeeds is [geoip.crawl-geofeeds]: geofeeds.Crawler with
+// Once=false. Run drains the due URLs and returns, so it is restarted after
+// geofeedIdle until cancel.
 func (dm *Daemon) runGeoIPGeofeeds(ctx context.Context, logger *zap.Logger, st *postgres.Store) {
-	gc := dm.cfg.GeoIP
+	gc := dm.cfg.GeoIP.CrawlGeofeeds
 
 	cr := &geofeeds.Crawler{
 		Store:      st,
@@ -495,14 +497,14 @@ func (dm *Daemon) runGeoIPGeofeeds(ctx context.Context, logger *zap.Logger, st *
 	runQueue(ctx, logger, geofeedIdle, cr.Run)
 }
 
-// runRPKI is [rpki]: Ingest from routinator-addr (then the fallback) on
-// interval. A failed fetch keeps the last vrp / aspa snapshot.
+// runRPKI is [rpki.ingest]: Ingest from routinator-addr (then the fallback)
+// on interval. A failed fetch keeps the last vrp / aspa snapshot.
 func (dm *Daemon) runRPKI(ctx context.Context, logger *zap.Logger, st *postgres.Store) {
-	rc := dm.cfg.RPKI
+	ri := dm.cfg.RPKI.Ingest
 
 	in := rpki.NewIngestor(logger, st, &http.Client{Timeout: 10 * time.Minute})
-	runPeriodic(ctx, logger, rc.Interval.Std(), func(ctx context.Context) error {
-		if err := in.Ingest(ctx, rc.RoutinatorAddr, rc.RoutinatorFallbackAddr); err != nil {
+	runPeriodic(ctx, logger, ri.Interval.Std(), func(ctx context.Context) error {
+		if err := in.Ingest(ctx, ri.RoutinatorAddr, ri.RoutinatorFallbackAddr); err != nil {
 			return fmt.Errorf("rpki ingest failed; last vrp/aspa snapshot kept: %w", err)
 		}
 		return nil

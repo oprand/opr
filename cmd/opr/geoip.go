@@ -20,22 +20,14 @@ func geoIPCommand() *cli.Command {
 		Name:     "geoip",
 		Aliases:  []string{"gi"},
 		Category: commandCategoryData,
-		Usage:    "Geolocation ingest. RFC 9632 CSVs from the geofeeds catalog, plus the LACNIC inetnum CSV, the RIPE IPmap dump, and bgptools anycast prefix dumps. Not RDAP; not crawl_target.",
-		Description: `Geolocation ingest. RFC 9632 CSVs from the geofeeds catalog, plus the LACNIC inetnum CSV, the RIPE IPmap dump, and bgptools anycast prefix dumps. Not RDAP; not crawl_target.
+		Usage:    "Geolocation ingest from the geofeeds catalog (RFC 9632), LACNIC, RIPE IPmap, and bgptools anycast. Not RDAP; not crawl_target. Needs Postgres.",
+		Description: `Pick a subcommand. crawl-geofeeds / lacnic / ipmap / anycast write rows; prune cleans orphans; status is read-only.
 
-Subcommands:
-  crawl-geofeeds  One HTTP GET per unique catalog URL (not per inetnum). 304 / fresh Cache-Control skips parse. New URLs first. 404/non-CSV quarantines the URL and does not wipe geoip. Does not fetch LACNIC, IPmap, or anycast.
-  prune           Deletes geoip rows whose source_url is gone from geofeeds. Does not download. Catalog URL prune stays in registry-crawl bulk after a complete pass-1 harvest.
-  lacnic          Existing LACNIC CSV into geoip (source=LACNIC_DB_CSV). May overlap RFC 9632 prefixes; both rows kept.
-  ipmap           RIPE IPmap dump into geoip (source=RIPE_IPMAP). May overlap GEOFEED/LACNIC prefixes; both rows kept.
-  anycast         bgptools anycatch v4/v6 prefix CSVs into anycast_prefix. Lookup prefers a covering anycast prefix over IPmap city.
-  status          Read-only board for the geofeeds catalog, derived geoip rows, the LACNIC CSV, the RIPE IPmap dump, and anycast dumps. No downloads.
-
-Bare "opr geoip" prints this help.`,
+When: after geofeeds catalog rows exist (registry-crawl bulk harvest) for crawl-geofeeds/prune; lacnic/ipmap/anycast are independent dumps.`,
 		Subcommands: []*cli.Command{
 			{
 				Name:  "crawl-geofeeds",
-				Usage: "One HTTP GET per unique catalog URL (not per inetnum). 304 / fresh Cache-Control skips parse. New URLs first. 404/non-CSV quarantines the URL and does not wipe geoip. Does not fetch LACNIC.",
+				Usage: "One HTTP GET per unique catalog URL (not per inetnum). 304 / fresh Cache-Control skips parse. New URLs first. 404/non-CSV quarantines the URL and does not wipe geoip. Does not fetch LACNIC. In opr run this is the continuous [geoip.crawl-geofeeds] job.",
 				Flags: []cli.Flag{
 					&cli.IntFlag{
 						Name:  "worker-count",
@@ -76,12 +68,12 @@ Bare "opr geoip" prints this help.`,
 			},
 			{
 				Name:   "lacnic",
-				Usage:  "Existing LACNIC CSV into geoip (source=LACNIC_DB_CSV). May overlap RFC 9632 prefixes; both rows kept.",
+				Usage:  "Existing LACNIC CSV into geoip (source=LACNIC_DB_CSV). May overlap RFC 9632 prefixes; both rows kept. In opr run this is the periodic [geoip.lacnic] job.",
 				Action: runGeoIPLacnic,
 			},
 			{
 				Name:  "ipmap",
-				Usage: "RIPE IPmap dump into geoip (source=RIPE_IPMAP). May overlap GEOFEED/LACNIC prefixes; both rows kept.",
+				Usage: "RIPE IPmap dump into geoip (source=RIPE_IPMAP). May overlap GEOFEED/LACNIC prefixes; both rows kept. In opr run this is the periodic [geoip.ipmap] job.",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:  "force",
@@ -97,7 +89,7 @@ Bare "opr geoip" prints this help.`,
 			},
 			{
 				Name:  "anycast",
-				Usage: "bgptools anycatch v4/v6 prefix CSVs into anycast_prefix. Lookup prefers a covering anycast prefix over IPmap city.",
+				Usage: "bgptools anycatch v4/v6 prefix CSVs into anycast_prefix. Lookup prefers a covering anycast prefix over IPmap city. In opr run this is the periodic [geoip.anycast] job.",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:  "force",

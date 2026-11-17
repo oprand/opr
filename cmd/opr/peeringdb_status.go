@@ -18,7 +18,7 @@ import (
 func peeringdbStatusCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "status",
-		Usage: "Print a read-only status board for PeeringDB dump tables, dump clocks, and the last data clock. No downloads.",
+		Usage: "Print a read-only status board for PeeringDB dump tables, dump clocks, and the last data clock. No downloads. Needs Postgres.",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:  "json",

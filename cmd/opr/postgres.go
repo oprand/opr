@@ -14,16 +14,10 @@ func postgresCommand() *cli.Command {
 	return &cli.Command{
 		Name:     "postgres",
 		Category: commandCategoryManagement,
-		Usage:    "Management command that only touches the Postgres schema. Other commands still migrate on startup.",
-		Description: `Management command that only touches the Postgres schema (bookkeeping table opr_migrations). It does not ingest.
+		Usage:    "Management command for the Postgres schema (opr_migrations). Other commands still migrate on startup.",
+		Description: `Touches only the Postgres schema bookkeeping table opr_migrations. It does not ingest.
 
-Other commands still run these migrations on startup. Use this command to apply or inspect the schema without starting an ingest.
-
-Subcommands:
-  migrate  Apply pending migrations. Already-at-latest is a success and changes nothing.
-  version  Print the applied schema version, its dirty flag, and the version this binary expects. Does not migrate.
-
-Bare "opr postgres" prints this help. Requires global --dsn.`,
+Use migrate/version to apply or inspect without starting an ingest. Requires global --dsn.`,
 		Subcommands: []*cli.Command{
 			{
 				Name:   "migrate",

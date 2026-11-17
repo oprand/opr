@@ -24,16 +24,10 @@ func rdnsCommand() *cli.Command {
 	return &cli.Command{
 		Name:     "rdns",
 		Category: commandCategoryData,
-		Usage:    "Ingest RIR reverse-DNS zone files, IANA parent cuts, and WHOIS enrich into rdns_delegation. ingest and crawl-ptr also run as jobs in opr run ([rdns.*] tables).",
-		Description: `Ingest RIR reverse-DNS zone files (NS / DS / RFC 2317 CNAME) into rdns_delegation,
-plus InterNIC parent zones (coverage checklist) and WHOIS reverse domain:/LACNIC nserver enrich.
+		Usage:    "RIR reverse-DNS zones, IANA parent cuts, and WHOIS enrich into rdns_delegation. ingest and crawl-ptr also run under opr run ([rdns.*]).",
+		Description: `Pick a subcommand. ingest writes NS/DS/CNAME (plus IANA/WHOIS enrich); crawl-ptr queries PTR at delegated nservers; status is read-only.
 
-Subcommands:
-  ingest     List each RIR /zones/ directory, skip checksums, ETag-skip unchanged files, persist per source_url. Then IANA + WHOIS.
-  status     Read-only counts per RIR, IANA expected vs fetched, WHOIS enrich, PTR aggregates, dump clocks.
-  crawl-ptr  PTR at delegated nservers. Full crawl = /24 block queue. Smoke: --prefix /24. In opr run it is the continuous [rdns.crawl-ptr] job.
-
-Bare "opr rdns" prints this help.`,
+Needs Postgres.`,
 		Subcommands: []*cli.Command{
 			{
 				Name:  "ingest",
@@ -146,15 +140,11 @@ func rdnsCrawlPTRCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "crawl-ptr",
 		Usage: "Query PTR at delegated nservers. Unscoped full crawl is a /24 block queue (resume via rdns_ptr_block). In opr run this is the continuous unscoped [rdns.crawl-ptr] job.",
-		Description: `Scoped --zone/--prefix uses the GiST deepest-cut query (smoke tests).
+		Description: `Does: PTR queries at leaf nservers. Scoped --zone/--prefix uses the GiST deepest-cut (smoke). Unscoped seeds rdns_ptr_block (IPv4 /24–32, IPv6 /120+) and claims one block at a time.
 
-Unscoped (no --zone/--prefix) seeds rdns_ptr_block from IPv4 masklen 24–32 (RFC 2317 /25+) and IPv6 /120+, then claims one block at a time (256 PTRs per /24). Leftover /8 and /16 are not expanded. Does not run the unscoped prefix << anti-join.
+Needs: Postgres; prior rdns ingest so leaves exist.
 
-TIMEOUT/SERVFAIL/ERROR blocks are failed and re-queued on the next seed; RFC 8020 NXDOMAIN on the zone stays done. --limit mid-block leaves the row leased so the next claim skips it. --only-registries filters seed and claim. --timeout is the per-query DNS deadline.
-
-Smoke: opr rdns crawl-ptr --prefix 193.0.0.0/24 --limit 256 --only-registries RIPE
-Full:  opr rdns crawl-ptr
-Resume: opr rdns crawl-ptr`,
+When: after ingest. Smoke: opr rdns crawl-ptr --prefix 193.0.0.0/24 --limit 256 --only-registries RIPE. Full/resume: opr rdns crawl-ptr.`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "prefix",

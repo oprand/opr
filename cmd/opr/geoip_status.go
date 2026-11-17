@@ -17,7 +17,7 @@ import (
 func geoIPStatusCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "status",
-		Usage: "Print a read-only status board for the geofeeds catalog, derived geoip rows, the LACNIC CSV, the RIPE IPmap dump, and bgptools anycast prefix dumps. No downloads.",
+		Usage: "Print a read-only status board for geofeeds, geoip, LACNIC, IPmap, and anycast. No downloads. Needs Postgres.",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:  "json",
