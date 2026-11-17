@@ -1,0 +1,55 @@
+{
+  "rdapConformance": [
+    "rdap_level_0",
+    "geofeed1"
+  ],
+  "handle": "NET-203-0-113-0-1",
+  "startAddress": "203.0.113.0",
+  "endAddress": "203.0.113.255",
+  "ipVersion": "v4",
+  "name": "TEST-NET-3-GEOFEED",
+  "type": "ASSIGNED",
+  "status": ["active"],
+  "objectClassName": "ip network",
+  "cidr0_cidrs": [
+    {
+      "v4prefix": "203.0.113.0",
+      "length": 24
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.arin.net/registry/ip/203.0.113.0/24",
+      "rel": "self",
+      "type": "application/rdap+json",
+      "href": "https://rdap.arin.net/registry/ip/203.0.113.0/24"
+    },
+    {
+      "value": "https://rdap.arin.net/registry/ip/203.0.113.0/24",
+      "rel": "geofeed",
+      "type": "application/geofeed+csv",
+      "href": "https://example.com/geofeed.csv"
+    }
+  ],
+  "entities": [
+    {
+      "handle": "ORG-EX-1",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "Example Org"],
+          ["kind", {}, "text", "org"]
+        ]
+      ],
+      "roles": ["registrant"],
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://rdap.arin.net/registry/entity/ORG-EX-1"
+        }
+      ],
+      "objectClassName": "entity"
+    }
+  ]
+}

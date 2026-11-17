@@ -1,0 +1,56 @@
+{
+  "rdapConformance": [
+    "nro_rdap_profile_0",
+    "rdap_level_0",
+    "cidr0",
+    "rirSearch1"
+  ],
+  "handle": "NET-192-0-2-0-1",
+  "startAddress": "192.0.2.0",
+  "endAddress": "192.0.2.255",
+  "ipVersion": "v4",
+  "name": "TEST-NET-1-ASSIGNMENT",
+  "type": "DIRECT ASSIGNMENT",
+  "parentHandle": "NET-192-0-2-0-0",
+  "status": ["active", "assignment"],
+  "objectClassName": "ip network",
+  "cidr0_cidrs": [
+    {
+      "v4prefix": "192.0.2.0",
+      "length": 24
+    }
+  ],
+  "events": [
+    {
+      "eventAction": "last changed",
+      "eventDate": "2022-04-21T16:48:14-04:00"
+    },
+    {
+      "eventAction": "registration",
+      "eventDate": "2000-03-30T00:00:00-05:00"
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.arin.net/registry/ip/192.0.2.0/24",
+      "rel": "self",
+      "type": "application/rdap+json",
+      "href": "https://rdap.arin.net/registry/ip/192.0.2.0/24"
+    }
+  ],
+  "entities": [
+    {
+      "handle": "GOGL",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "Google LLC"],
+          ["kind", {}, "text", "org"]
+        ]
+      ],
+      "roles": ["registrant"],
+      "objectClassName": "entity"
+    }
+  ]
+}

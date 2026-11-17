@@ -1,0 +1,78 @@
+{
+  "rdapConformance": [
+    "rdap_level_0",
+    "nro_rdap_profile_0"
+  ],
+  "handle": "2804:14d::/32",
+  "startAddress": "2804:14d::",
+  "endAddress": "2804:14d:ffff:ffff:ffff:ffff:ffff:ffff",
+  "ipVersion": "v6",
+  "name": "NIC-BR",
+  "type": "allocated",
+  "country": "BR",
+  "status": ["active"],
+  "objectClassName": "ip network",
+  "events": [
+    {
+      "eventAction": "last changed",
+      "eventDate": "2023-01-15T12:00:00Z"
+    },
+    {
+      "eventAction": "registration",
+      "eventDate": "2012-06-01T00:00:00Z"
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.lacnic.net/rdap/ip/2804:14d::/32",
+      "rel": "self",
+      "type": "application/rdap+json",
+      "href": "https://rdap.lacnic.net/rdap/ip/2804:14d::/32"
+    }
+  ],
+  "entities": [
+    {
+      "handle": "BR-NIC-LACNIC",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "Nucleo de Informacao e Coordenacao do Ponto BR"],
+          [
+            "adr",
+            {
+              "label": "Av. das Nacoes Unidas\nSao Paulo\nSP\nBrazil"
+            },
+            "text",
+            ["", "", "", "", "", "", ""]
+          ],
+          ["kind", {}, "text", "org"]
+        ]
+      ],
+      "roles": ["registrant"],
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://rdap.lacnic.net/rdap/entity/BR-NIC-LACNIC"
+        }
+      ],
+      "entities": [
+        {
+          "handle": "ABU123",
+          "vcardArray": [
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              ["fn", {}, "text", "NIC.br Abuse"],
+              ["kind", {}, "text", "group"],
+              ["email", {}, "text", "abuse@registro.br"]
+            ]
+          ],
+          "roles": ["abuse"],
+          "objectClassName": "entity"
+        }
+      ],
+      "objectClassName": "entity"
+    }
+  ]
+}

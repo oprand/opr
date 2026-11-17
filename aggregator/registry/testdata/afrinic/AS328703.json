@@ -1,0 +1,227 @@
+{
+  "lang": "en",
+  "notices": [
+    {
+      "title": "ABOUT",
+      "description": ["This is the AfriNIC RDAP server."],
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/autnum/328703",
+          "rel": "describedby",
+          "href": "https://www.afrinic.net/support/whois-db/reference-manual",
+          "hreflang": ["en"],
+          "type": "text/html",
+          "title": "AFRINIC Database Reference Manual",
+          "media": "screen"
+        }
+      ]
+    },
+    {
+      "title": "Terms and Conditions",
+      "description": [
+        "This is the AFRINIC Database query service. The objects are in RDAP format."
+      ],
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/autnum/328703",
+          "rel": "terms-of-service",
+          "href": "https://afrinic.net/whois/terms",
+          "type": "text/html"
+        }
+      ]
+    },
+    {
+      "title": "Whois Inaccuracy Reporting",
+      "links": [
+        {
+          "href": "https://www.afrinic.net/support/whois-db/reference-manual",
+          "title": "AFRINIC WHOIS Inaccuracy Report"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.afrinic.net/rdap/autnum/AS328703",
+      "rel": "self",
+      "href": "https://rdap.afrinic.net/rdap/autnum/AS328703"
+    }
+  ],
+  "handle": "AS328703",
+  "events": [
+    {
+      "eventAction": "registration",
+      "eventDate": "2020-07-16T19:31:00Z"
+    },
+    {
+      "eventAction": "last changed"
+    }
+  ],
+  "status": ["active"],
+  "port43": "whois.afrinic.net",
+  "name": "ORG-SNI2-AFRINIC",
+  "entities": [
+    {
+      "lang": "en",
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/entity/LR11-AFRINIC",
+          "rel": "self",
+          "href": "https://rdap.afrinic.net/rdap/entity/LR11-AFRINIC"
+        }
+      ],
+      "handle": "LR11-AFRINIC",
+      "status": ["active"],
+      "port43": "whois.afrinic.net",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["kind", {}, "text", "individual"],
+          ["fn", {}, "text", "Lindy Ravinia"],
+          [
+            "tel",
+            {
+              "label": "103 Sham Peng Tong Plaza",
+              "type": "work"
+            },
+            "text",
+            "tel:+248-4-671-965"
+          ],
+          [
+            "email",
+            {
+              "label": "103 Sham Peng Tong Plaza",
+              "type": "work"
+            },
+            "text",
+            "info@seven.network"
+          ],
+          [
+            "adr",
+            {
+              "label": "103 Sham Peng Tong Plaza",
+              "type": "work"
+            },
+            "text",
+            ["103 Sham Peng Tong Plaza", "", "", "", "", "", ""]
+          ]
+        ]
+      ],
+      "roles": ["technical"],
+      "objectClassName": "entity"
+    },
+    {
+      "lang": "en",
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/entity/MJ20-AFRINIC",
+          "rel": "self",
+          "href": "https://rdap.afrinic.net/rdap/entity/MJ20-AFRINIC"
+        }
+      ],
+      "handle": "MJ20-AFRINIC",
+      "status": ["active"],
+      "port43": "whois.afrinic.net",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["kind", {}, "text", "individual"],
+          ["fn", {}, "text", "Mary Jane"],
+          [
+            "tel",
+            {
+              "label": "103 Sham Peng Tong Plaza\nVictoria\nSeychelles",
+              "type": "work"
+            },
+            "text",
+            "tel:+248-4-671-965"
+          ],
+          [
+            "email",
+            {
+              "label": "103 Sham Peng Tong Plaza\nVictoria\nSeychelles",
+              "type": "work"
+            },
+            "text",
+            "ceo@seven.network"
+          ],
+          [
+            "adr",
+            {
+              "label": "103 Sham Peng Tong Plaza\nVictoria\nSeychelles",
+              "type": "work"
+            },
+            "text",
+            [
+              "103 Sham Peng Tong Plaza",
+              "Victoria",
+              "Seychelles",
+              "",
+              "",
+              "",
+              ""
+            ]
+          ]
+        ]
+      ],
+      "roles": ["administrative"],
+      "objectClassName": "entity"
+    },
+    {
+      "lang": "en",
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/entity/ORG-SNI2-AFRINIC",
+          "rel": "self",
+          "href": "https://rdap.afrinic.net/rdap/entity/ORG-SNI2-AFRINIC"
+        }
+      ],
+      "handle": "ORG-SNI2-AFRINIC",
+      "status": ["active"],
+      "port43": "whois.afrinic.net",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["kind", {}, "text", "org"],
+          ["fn", {}, "text", "Seven Network Inc."],
+          [
+            "tel",
+            {
+              "label": "103 Sham Peng Tong Plaza\nVictoria Mahe",
+              "type": "work"
+            },
+            "text",
+            "tel:+248-4-671-965"
+          ],
+          [
+            "email",
+            {
+              "label": "103 Sham Peng Tong Plaza\nVictoria Mahe",
+              "type": "work"
+            },
+            "text",
+            "info@seven.network"
+          ],
+          [
+            "adr",
+            {
+              "label": "103 Sham Peng Tong Plaza\nVictoria Mahe",
+              "type": "work"
+            },
+            "text",
+            ["103 Sham Peng Tong Plaza", "Victoria Mahe", "", "", "", "", ""]
+          ]
+        ]
+      ],
+      "roles": ["registrant"],
+      "objectClassName": "entity"
+    }
+  ],
+  "startAutnum": 328703,
+  "endAutnum": 328703,
+  "objectClassName": "autnum",
+  "rdapConformance": ["rdap_level_0, nro_rdap_profile_0, cidr0"]
+}

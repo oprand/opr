@@ -1,0 +1,42 @@
+inetnum:        192.0.2.0 - 192.0.2.255
+netname:        RIPE-GEOFEED
+geofeed:        https://ripe.example/official.csv
+remarks:        Geofeed https://ripe.example/remarks.csv
+country:        NL
+source:         RIPE
+
+inet6num:       2001:db8::/32
+netname:        APNIC-GEOFEED
+geofeed:        https://apnic.example/v6.csv
+country:        AU
+source:         APNIC
+
+inetnum:        196.0.0.0 - 196.0.0.255
+netname:        AFRINIC-GEOFEED
+remarks:        Geofeed https://afrinic.example/feed.csv
+country:        ZA
+source:         AFRINIC
+
+inetnum:        198.51.100.0 - 198.51.100.255
+netname:        ARIN-GEOFEED
+Comment:        Geofeed https://arin.example/feed.csv
+country:        US
+source:         ARIN
+
+inetnum:        203.0.113.0 - 203.0.113.255
+netname:        WRAP-GEOFEED
+remarks:        Geofeed
+                https://wrap.example/feed.csv
+country:        JP
+source:         APNIC
+
+inetnum:        192.0.2.128 - 192.0.2.255
+netname:        CASE-GEOFEED
+geofeed:        HTTP://Example.COM/Feed.csv
+country:        US
+source:         ARIN
+
+aut-num:        AS64500
+as-name:        FAKE-GEOFEED
+remarks:        Geofeed https://autnum.example/should-not-collect.csv
+source:         RIPE

@@ -1,0 +1,130 @@
+{
+  "objectClassName": "autnum",
+  "handle": "AS1296",
+  "type": "DIRECT ALLOCATION",
+  "entities": [
+    {
+      "objectClassName": "entity",
+      "handle": "CL-UOCH1-LACNIC",
+      "roles": ["registrant"],
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "University of Chili"],
+          ["kind", {}, "text", "org"],
+          [
+            "adr",
+            {},
+            "text",
+            [
+              "",
+              "",
+              "Fac. de Ciencias Fisicas y Matematicas\nBlanco Encalada 2120\nSantiago",
+              "",
+              "",
+              "",
+              "CL"
+            ]
+          ],
+          [
+            "tel",
+            {
+              "type": "voice"
+            },
+            "text",
+            ""
+          ]
+        ]
+      ],
+      "links": [
+        {
+          "value": "https://rdap.lacnic.net/rdap/entity/CL-UOCH1-LACNIC",
+          "rel": "self",
+          "type": "application/rdap+json",
+          "href": "https://rdap.lacnic.net/rdap/entity/CL-UOCH1-LACNIC"
+        }
+      ]
+    },
+    {
+      "objectClassName": "entity",
+      "handle": "VU-ARIN",
+      "roles": ["administrative"],
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "Vladimir Ulyashin"],
+          ["kind", {}, "text", "individual"],
+          [
+            "adr",
+            {},
+            "text",
+            [
+              "",
+              "",
+              "HEFFLER, RADETECH & SAITTA\n1515 MARKET ST",
+              "",
+              "",
+              "",
+              "US"
+            ]
+          ],
+          [
+            "tel",
+            {
+              "type": "voice"
+            },
+            "text",
+            "925-253-0942"
+          ],
+          ["email", {}, "text", "vlad@bgrg.com"]
+        ]
+      ],
+      "links": [
+        {
+          "value": "https://rdap.lacnic.net/rdap/entity/VU-ARIN",
+          "rel": "self",
+          "type": "application/rdap+json",
+          "href": "https://rdap.lacnic.net/rdap/entity/VU-ARIN"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "eventAction": "registration",
+      "eventDate": "1991-06-11T12:00:00Z"
+    },
+    {
+      "eventAction": "last changed",
+      "eventDate": "1991-06-12T12:00:00Z"
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.lacnic.net/rdap/autnum/AS1296",
+      "rel": "self",
+      "type": "application/rdap+json",
+      "href": "https://rdap.lacnic.net/rdap/autnum/AS1296"
+    }
+  ],
+  "rdapConformance": ["rdap_level_0", "lacnic_level_0", "cidr0"],
+  "notices": [
+    {
+      "title": "Terms and Conditions",
+      "description": [
+        "This is the LACNIC RDAP service. Objects are in RDAP format."
+      ],
+      "links": [
+        {
+          "value": "http://www.lacnic.net/web/lacnic/registration-data-access-protocol",
+          "rel": "terms-of-service",
+          "type": "text/html",
+          "href": "http://www.lacnic.net/web/lacnic/registration-data-access-protocol"
+        }
+      ]
+    }
+  ],
+  "port43": "whois.lacnic.net"
+}

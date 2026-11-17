@@ -1,0 +1,134 @@
+{
+  "objectClassName": "autnum",
+  "handle": "270482",
+  "startAutnum": 270482,
+  "endAutnum": 270482,
+  "name": "ASN270482",
+  "type": "DIRECT ALLOCATION",
+  "country": "BR",
+  "links": [
+    {
+      "value": "https://rdap.registro.br/autnum/270482",
+      "rel": "self",
+      "href": "https://rdap.registro.br/autnum/270482",
+      "type": "application/rdap+json"
+    },
+    {
+      "value": "https://rdap.registro.br/autnum/270482",
+      "rel": "related",
+      "href": "https://rdap.registro.br/ip/200.50.208.0/22",
+      "type": "application/rdap+json"
+    },
+    {
+      "value": "https://rdap.registro.br/autnum/270482",
+      "rel": "related",
+      "href": "https://rdap.registro.br/ip/2804:6ca4::/32",
+      "type": "application/rdap+json"
+    }
+  ],
+  "entities": [
+    {
+      "objectClassName": "entity",
+      "handle": "22862271000199",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["kind", {}, "text", "org"],
+          ["fn", {}, "text", "Raiden Telecom"],
+          ["adr", {}, "text", ["", "", "", "", "", "", "BR"]]
+        ]
+      ],
+      "roles": ["registrant"],
+      "publicIds": [{ "type": "cnpj", "identifier": "22.862.271/0001-99" }],
+      "entities": [
+        {
+          "objectClassName": "entity",
+          "handle": "SAFSI147",
+          "vcardArray": [
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              ["kind", {}, "text", "individual"],
+              ["fn", {}, "text", "samuel de Figueiredo Silva"],
+              ["email", {}, "text", "samuel.figueiredo.silva@gmail.com"],
+              ["lang", {}, "language-tag", "pt"],
+              ["adr", {}, "text", ["", "", "", "", "", "", "BR"]]
+            ]
+          ],
+          "roles": ["administrative"],
+          "events": [
+            {
+              "eventAction": "registration",
+              "eventDate": "2015-06-11T16:42:16Z"
+            },
+            {
+              "eventAction": "last changed",
+              "eventDate": "2021-08-27T15:09:18Z"
+            }
+          ]
+        }
+      ],
+      "events": [
+        { "eventAction": "registration", "eventDate": "2019-03-29T18:46:02Z" },
+        { "eventAction": "last changed", "eventDate": "2021-10-28T16:55:16Z" }
+      ],
+      "links": [
+        {
+          "value": "https://rdap.registro.br/entity/22862271000199",
+          "rel": "self",
+          "href": "https://rdap.registro.br/entity/22862271000199",
+          "type": "application/rdap+json"
+        }
+      ],
+      "legalRepresentative": "Samuel Silva"
+    },
+    {
+      "objectClassName": "entity",
+      "handle": "SAFSI147",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["kind", {}, "text", "individual"],
+          ["fn", {}, "text", "samuel de Figueiredo Silva"],
+          ["email", {}, "text", "samuel.figueiredo.silva@gmail.com"],
+          ["lang", {}, "language-tag", "pt"],
+          ["adr", {}, "text", ["", "", "", "", "", "", "BR"]]
+        ]
+      ],
+      "roles": ["administrative", "abuse"],
+      "events": [
+        { "eventAction": "registration", "eventDate": "2015-06-11T16:42:16Z" },
+        { "eventAction": "last changed", "eventDate": "2021-08-27T15:09:18Z" }
+      ]
+    }
+  ],
+  "events": [
+    { "eventAction": "registration", "eventDate": "2020-03-11T12:18:03Z" },
+    { "eventAction": "last changed", "eventDate": "2020-03-11T12:18:03Z" }
+  ],
+  "notices": [
+    {
+      "title": "Use and Privacy Policy",
+      "description": [
+        "Copyright (c) NIC.br",
+        "The use of the data is only permitted as described in",
+        "full by the Use and Privacy Policy, being prohibited its ",
+        "distribution, commercialization or reproduction, in ",
+        "particular, to use it for advertising or any similar ",
+        "purpose."
+      ],
+      "links": [
+        {
+          "value": "https://rdap.registro.br/autnum/270482",
+          "rel": "alternate",
+          "href": "https://registro.br/upp",
+          "type": "text/html"
+        }
+      ]
+    }
+  ],
+  "rdapConformance": ["rdap_level_0", "nicbr_level_0"],
+  "port43": "whois.nic.br"
+}

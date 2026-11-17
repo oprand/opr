@@ -1,0 +1,43 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: opr
+          POSTGRES_PASSWORD: opr
+          POSTGRES_DB: opr
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U opr -d opr"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      OPR_TEST_DSN: postgresql://opr:opr@localhost:5432/opr?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.6"
+
+      - name: gofmt
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "gofmt needed on:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: go test
+        run: go test ./...

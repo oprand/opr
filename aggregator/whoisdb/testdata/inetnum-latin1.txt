@@ -1,0 +1,6 @@
+inetnum:        196.32.192.0 - 196.32.192.255
+netname:        CAFE-RESEAU
+descr:          Café Réseau Sàrl
+country:        MU
+status:         ASSIGNED PA
+source:         AFRINIC

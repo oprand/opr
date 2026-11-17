@@ -1,0 +1,30 @@
+{
+  "rdapConformance": [
+    "nro_rdap_profile_0",
+    "rdap_level_0",
+    "cidr0",
+    "rirSearch1"
+  ],
+  "handle": "NET-192-0-2-0-0",
+  "startAddress": "192.0.2.0",
+  "endAddress": "192.0.2.255",
+  "ipVersion": "v4",
+  "name": "TEST-NET-1-ALLOCATION",
+  "type": "ALLOCATION",
+  "status": ["active", "allocation"],
+  "objectClassName": "ip network",
+  "cidr0_cidrs": [
+    {
+      "v4prefix": "192.0.2.0",
+      "length": 24
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.arin.net/registry/ip/192.0.2.0/24",
+      "rel": "self",
+      "type": "application/rdap+json",
+      "href": "https://rdap.arin.net/registry/ip/192.0.2.0/24"
+    }
+  ]
+}

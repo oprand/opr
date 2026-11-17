@@ -1,0 +1,31 @@
+organisation:   ORG-TEST1-AFRINIC
+org-name:       Test Org
+org-type:       LIR
+country:        ZA
+admin-c:        TP1-AFRINIC
+tech-c:         TP1-AFRINIC
+mnt-by:         AFRINIC-HM-MNT
+mnt-ref:        AFRINIC-HM-MNT
+source:         AFRINIC
+
+role:           Test Abuse Role
+address:        Somewhere
+admin-c:        TP1-AFRINIC
+tech-c:         TP1-AFRINIC
+nic-hdl:        TR1-AFRINIC
+abuse-mailbox:  abuse@example.test
+mnt-by:         AFRINIC-HM-MNT
+source:         AFRINIC
+
+person:         Test Person
+address:        Somewhere
+phone:          +27 11 000 0000
+nic-hdl:        TP1-AFRINIC
+mnt-by:         AFRINIC-HM-MNT
+source:         AFRINIC
+
+route:          196.192.103.0/24
+descr:          Test route
+origin:         AS36885
+mnt-by:         TEST-MNT
+source:         AFRINIC

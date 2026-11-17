@@ -1,0 +1,126 @@
+# Local Postgres and ClickHouse for opr.
+# Optional profiles are not started by `docker compose up -d` or `make localdb`:
+#   dns  — Unbound (`make localunbound`)
+#   rpki — Routinator (`make localroutinator`)
+# Start: make localdb
+# Stop:  make stoplocaldb   (postgres and clickhouse only; volumes kept)
+# Reset: make resetlocaldb  (deletes only opr_postgres and opr_clickhouse)
+# Details: store/README.md
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: opr
+      POSTGRES_PASSWORD: opr
+      POSTGRES_DB: opr
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - opr_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U opr -d opr"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8-alpine
+    environment:
+      CLICKHOUSE_DB: opr
+      # Local-only default. The opr client user is "default"; do not set CLICKHOUSE_USER.
+      CLICKHOUSE_PASSWORD: opr
+    ports:
+      - "127.0.0.1:8123:8123"
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - opr_clickhouse:/var/lib/clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    # Ceiling for this container, not a reservation of the whole Docker Desktop VM.
+    # The VM must be larger than 16g or ingest-cc can OOM-kill ClickHouse.
+    mem_limit: 16g          # hard container limit (Compose v2)
+    mem_reservation: 8g     # soft reservation
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8123/ping | grep -q Ok"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  # Local Unbound recursive resolver for opr fdns resolve.
+  # Profile dns: not started by `docker compose up -d` or `make localdb`.
+  # Start with: make localunbound
+  # DNS: 127.0.0.1:${UNBOUND_HOST_PORT} UDP+TCP (loopback only).
+  # make defaults UNBOUND_HOST_PORT to 5353 on Darwin (typical :53 conflict)
+  # and 53 elsewhere. UNBOUND_HOST_PORT=53 still publishes :53 if you want it.
+  # Scan with: opr fdns resolve --resolver 127.0.0.1[:PORT]
+  # (bare 127.0.0.1 only when the published port is 53; NormalizeResolverAddr
+  # appends :53 to bare IPs).
+  # Pin: mvance/unbound:1.22.0 (default image is a Cloudflare forwarder; our
+  # unbound.conf replaces it with recursion so a catalog scan does not hit
+  # public resolver rate limits). linux/amd64 only -- native on Intel Macs
+  # under Docker Desktop, not qemu/Rosetta.
+  unbound:
+    profiles: [dns]
+    image: mvance/unbound:1.22.0
+    container_name: opr-unbound
+    ports:
+      - "127.0.0.1:${UNBOUND_HOST_PORT:-53}:53/udp"
+      - "127.0.0.1:${UNBOUND_HOST_PORT:-53}:53/tcp"
+    volumes:
+      - ./deploy/unbound/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:ro
+      - unbound-cache:/opt/unbound/etc/unbound/var
+    mem_limit: 2g
+    cpus: 2.0
+    ulimits:
+      nofile:
+        # 2 threads × outgoing-range 8192, plus listen/TCP/conf. 65536 is
+        # 4× those outgoing FDs (ClickHouse in this file uses 262144).
+        soft: 65536
+        hard: 65536
+    healthcheck:
+      # local-zone only this conf answers; does not need public DNS.
+      test: ["CMD", "drill", "@127.0.0.1", "health.opr.test"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  # Local Routinator for opr RPKI/ASPA lookups.
+  # Profile rpki: not started by `docker compose up -d` or `make localdb`.
+  # Start with: make localroutinator
+  # HTTP: 127.0.0.1:8323  RTR: 127.0.0.1:3323
+  # Pin: nlnetlabs/routinator:v0.15.2 (--enable-aspa is a 0.15 global flag)
+  # First start fills the RPKI cache (a few GB) before /jsonext returns.
+  routinator:
+    profiles: [rpki]
+    image: nlnetlabs/routinator:v0.15.2
+    container_name: opr-routinator
+    command:
+      - --quiet
+      - --enable-aspa
+      - server
+      - --rtr
+      - 0.0.0.0:3323
+      - --http
+      - 0.0.0.0:8323
+    ports:
+      - "127.0.0.1:3323:3323"
+      - "127.0.0.1:8323:8323"
+    volumes:
+      - rpki-cache:/home/routinator/.rpki-cache
+    mem_limit: 1g
+    cpus: 1.0
+    restart: unless-stopped
+
+volumes:
+  opr_postgres:
+  opr_clickhouse:
+  unbound-cache:
+  rpki-cache:

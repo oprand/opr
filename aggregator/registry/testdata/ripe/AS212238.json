@@ -1,0 +1,116 @@
+{
+  "handle": "AS212238",
+  "name": "CDNEXT",
+  "type": "DIRECT ALLOCATION",
+  "entities": [
+    {
+      "handle": "DATACAMP-MNT",
+      "roles": ["registrant"],
+      "objectClassName": "entity"
+    },
+    {
+      "handle": "JP4750-RIPE",
+      "roles": ["administrative", "technical"],
+      "objectClassName": "entity"
+    },
+    {
+      "handle": "ORG-DL201-RIPE",
+      "roles": ["registrant"],
+      "objectClassName": "entity"
+    },
+    {
+      "handle": "RIPE-NCC-END-MNT",
+      "roles": ["registrant"],
+      "objectClassName": "entity"
+    },
+    {
+      "handle": "AC28308-RIPE",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "Abuse Contact"],
+          ["kind", {}, "text", "group"],
+          [
+            "adr",
+            {
+              "label": "Datacamp Limited\nZdenek Cendra\n207 Regent Street\nW1B 3HH\nLondon\nUNITED KINGDOM"
+            },
+            "text",
+            ["", "", "", "", "", "", ""]
+          ],
+          [
+            "email",
+            {
+              "type": "email"
+            },
+            "text",
+            "abuse@datacamp.co.uk"
+          ],
+          [
+            "email",
+            {
+              "type": "abuse"
+            },
+            "text",
+            "abuse@datacamp.co.uk"
+          ]
+        ]
+      ],
+      "roles": ["abuse"],
+      "entities": [
+        {
+          "handle": "DATACAMP-MNT",
+          "roles": ["registrant"],
+          "objectClassName": "entity"
+        }
+      ],
+      "objectClassName": "entity"
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.db.ripe.net/autnum/212238",
+      "rel": "self",
+      "href": "https://rdap.db.ripe.net/autnum/212238"
+    },
+    {
+      "value": "http://www.ripe.net/data-tools/support/documentation/terms",
+      "rel": "copyright",
+      "href": "http://www.ripe.net/data-tools/support/documentation/terms"
+    }
+  ],
+  "events": [
+    {
+      "eventAction": "last changed",
+      "eventDate": "2020-12-02T09:57:07Z"
+    }
+  ],
+  "rdapConformance": ["rdap_level_0"],
+  "notices": [
+    {
+      "title": "Filtered",
+      "description": ["This output has been filtered."]
+    },
+    {
+      "title": "Source",
+      "description": ["Objects returned came from source", "RIPE"]
+    },
+    {
+      "title": "Terms and Conditions",
+      "description": [
+        "This is the RIPE Database query service. The objects are in RDAP format."
+      ],
+      "links": [
+        {
+          "value": "https://rdap.db.ripe.net/autnum/212238",
+          "rel": "terms-of-service",
+          "href": "http://www.ripe.net/db/support/db-terms-conditions.pdf",
+          "type": "application/pdf"
+        }
+      ]
+    }
+  ],
+  "port43": "whois.ripe.net",
+  "objectClassName": "autnum"
+}

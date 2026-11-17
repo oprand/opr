@@ -1,0 +1,606 @@
+{
+  "rdapConformance": [
+    "nro_rdap_profile_0",
+    "rdap_level_0",
+    "nro_rdap_profile_asn_flat_0"
+  ],
+  "notices": [
+    {
+      "title": "Terms of Service",
+      "description": [
+        "By using the ARIN RDAP/Whois service, you are agreeing to the RDAP/Whois Terms of Use"
+      ],
+      "links": [
+        {
+          "value": "https://rdap.arin.net/registry/autnum/40575",
+          "rel": "terms-of-service",
+          "type": "text/html",
+          "href": "https://www.arin.net/resources/registry/whois/tou/"
+        }
+      ]
+    },
+    {
+      "title": "Whois Inaccuracy Reporting",
+      "description": ["If you see inaccuracies in the results, please visit: "],
+      "links": [
+        {
+          "value": "https://rdap.arin.net/registry/autnum/40575",
+          "rel": "inaccuracy-report",
+          "type": "text/html",
+          "href": "https://www.arin.net/resources/registry/whois/inaccuracy_reporting/"
+        }
+      ]
+    },
+    {
+      "title": "Copyright Notice",
+      "description": [
+        "Copyright 1997-2022, American Registry for Internet Numbers, Ltd."
+      ]
+    }
+  ],
+  "handle": "AS40575",
+  "startAutnum": 40575,
+  "endAutnum": 40575,
+  "name": "STRATOS",
+  "events": [
+    {
+      "eventAction": "last changed",
+      "eventDate": "2012-03-02T08:03:18-05:00"
+    },
+    {
+      "eventAction": "registration",
+      "eventDate": "2008-02-05T14:09:03-05:00"
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.arin.net/registry/autnum/40575",
+      "rel": "self",
+      "type": "application/rdap+json",
+      "href": "https://rdap.arin.net/registry/autnum/40575"
+    },
+    {
+      "value": "https://rdap.arin.net/registry/autnum/40575",
+      "rel": "alternate",
+      "type": "application/xml",
+      "href": "https://whois.arin.net/rest/asn/AS40575"
+    }
+  ],
+  "entities": [
+    {
+      "handle": "SOS-86",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "Stratos Global Communications"],
+          [
+            "adr",
+            {
+              "label": "34 GLENCOE DRIVE\nSt. John's\nNL\nA1C 5X3\nCanada"
+            },
+            "text",
+            ["", "", "", "", "", "", ""]
+          ],
+          ["kind", {}, "text", "org"]
+        ]
+      ],
+      "roles": ["registrant"],
+      "links": [
+        {
+          "value": "https://rdap.arin.net/registry/autnum/40575",
+          "rel": "self",
+          "type": "application/rdap+json",
+          "href": "https://rdap.arin.net/registry/entity/SOS-86"
+        },
+        {
+          "value": "https://rdap.arin.net/registry/autnum/40575",
+          "rel": "alternate",
+          "type": "application/xml",
+          "href": "https://whois.arin.net/rest/org/SOS-86"
+        }
+      ],
+      "events": [
+        {
+          "eventAction": "last changed",
+          "eventDate": "2022-02-07T05:48:53-05:00"
+        },
+        {
+          "eventAction": "registration",
+          "eventDate": "2008-01-31T09:09:37-05:00"
+        }
+      ],
+      "entities": [
+        {
+          "handle": "BOSJU-ARIN",
+          "vcardArray": [
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              [
+                "adr",
+                {
+                  "label": "Wijtsmaweg 11\nBurum\n\n9851TD\nNetherlands"
+                },
+                "text",
+                ["", "", "", "", "", "", ""]
+              ],
+              ["fn", {}, "text", "Jurjen Bos"],
+              ["n", {}, "text", ["Bos", "Jurjen", "", "", ""]],
+              ["kind", {}, "text", "individual"],
+              ["email", {}, "text", "jurjen.bos@inmarsat.com"],
+              [
+                "tel",
+                {
+                  "type": ["work", "voice"]
+                },
+                "text",
+                "+31594283221"
+              ]
+            ]
+          ],
+          "roles": ["technical"],
+          "links": [
+            {
+              "value": "https://rdap.arin.net/registry/autnum/40575",
+              "rel": "self",
+              "type": "application/rdap+json",
+              "href": "https://rdap.arin.net/registry/entity/BOSJU-ARIN"
+            },
+            {
+              "value": "https://rdap.arin.net/registry/autnum/40575",
+              "rel": "alternate",
+              "type": "application/xml",
+              "href": "https://whois.arin.net/rest/poc/BOSJU-ARIN"
+            }
+          ],
+          "events": [
+            {
+              "eventAction": "last changed",
+              "eventDate": "2022-02-07T05:44:57-05:00"
+            },
+            {
+              "eventAction": "registration",
+              "eventDate": "2015-09-29T07:39:21-04:00"
+            }
+          ],
+          "status": ["validated"],
+          "port43": "whois.arin.net",
+          "objectClassName": "entity"
+        },
+        {
+          "handle": "TECHN778-ARIN",
+          "vcardArray": [
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              [
+                "adr",
+                {
+                  "label": "99 City Road\nLondon\n\nEC1Y 1AX\nUnited Kingdom"
+                },
+                "text",
+                ["", "", "", "", "", "", ""]
+              ],
+              ["fn", {}, "text", "Technical Operations"],
+              ["org", {}, "text", "Technical Operations"],
+              ["kind", {}, "text", "group"],
+              ["email", {}, "text", "martin.bath@inmarsat.com"],
+              [
+                "tel",
+                {
+                  "type": ["work", "voice"]
+                },
+                "text",
+                "+44 20 7728 1516"
+              ]
+            ]
+          ],
+          "roles": ["technical", "noc"],
+          "links": [
+            {
+              "value": "https://rdap.arin.net/registry/autnum/40575",
+              "rel": "self",
+              "type": "application/rdap+json",
+              "href": "https://rdap.arin.net/registry/entity/TECHN778-ARIN"
+            },
+            {
+              "value": "https://rdap.arin.net/registry/autnum/40575",
+              "rel": "alternate",
+              "type": "application/xml",
+              "href": "https://whois.arin.net/rest/poc/TECHN778-ARIN"
+            }
+          ],
+          "events": [
+            {
+              "eventAction": "last changed",
+              "eventDate": "2022-05-03T17:45:52-04:00"
+            },
+            {
+              "eventAction": "registration",
+              "eventDate": "2009-02-24T12:47:44-05:00"
+            }
+          ],
+          "status": ["validated"],
+          "port43": "whois.arin.net",
+          "objectClassName": "entity"
+        },
+        {
+          "handle": "DAEME-ARIN",
+          "vcardArray": [
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              [
+                "adr",
+                {
+                  "label": "Wijtsmaweg 11\nBurum\n\n9851TD\nNetherlands"
+                },
+                "text",
+                ["", "", "", "", "", "", ""]
+              ],
+              ["fn", {}, "text", "Rudi Daemen"],
+              ["n", {}, "text", ["Daemen", "Rudi", "", "", ""]],
+              ["kind", {}, "text", "individual"],
+              ["email", {}, "text", "rudi.daemen@inmarsat.com"],
+              [
+                "tel",
+                {
+                  "type": ["work", "voice"]
+                },
+                "text",
+                "+31 594 283 293 "
+              ]
+            ]
+          ],
+          "roles": ["technical"],
+          "links": [
+            {
+              "value": "https://rdap.arin.net/registry/autnum/40575",
+              "rel": "self",
+              "type": "application/rdap+json",
+              "href": "https://rdap.arin.net/registry/entity/DAEME-ARIN"
+            },
+            {
+              "value": "https://rdap.arin.net/registry/autnum/40575",
+              "rel": "alternate",
+              "type": "application/xml",
+              "href": "https://whois.arin.net/rest/poc/DAEME-ARIN"
+            }
+          ],
+          "events": [
+            {
+              "eventAction": "last changed",
+              "eventDate": "2022-02-03T07:06:36-05:00"
+            },
+            {
+              "eventAction": "registration",
+              "eventDate": "2021-02-03T10:13:18-05:00"
+            }
+          ],
+          "status": ["validated"],
+          "port43": "whois.arin.net",
+          "objectClassName": "entity"
+        },
+        {
+          "handle": "ABUSE2189-ARIN",
+          "vcardArray": [
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              [
+                "adr",
+                {
+                  "label": "Wijtsmaweg 11\nBurum\n\n9851\nNetherlands"
+                },
+                "text",
+                ["", "", "", "", "", "", ""]
+              ],
+              ["fn", {}, "text", "Abuse"],
+              ["org", {}, "text", "Abuse"],
+              ["kind", {}, "text", "group"],
+              ["email", {}, "text", "eddy.berends@inmarsat.com"],
+              [
+                "tel",
+                {
+                  "type": ["work", "voice"]
+                },
+                "text",
+                "+31 594 283 255"
+              ]
+            ]
+          ],
+          "roles": ["abuse"],
+          "remarks": [
+            {
+              "title": "Unvalidated POC",
+              "description": [
+                "ARIN has attempted to validate the data for this POC, but has received no response from the POC since 2021-03-20"
+              ]
+            }
+          ],
+          "links": [
+            {
+              "value": "https://rdap.arin.net/registry/autnum/40575",
+              "rel": "self",
+              "type": "application/rdap+json",
+              "href": "https://rdap.arin.net/registry/entity/ABUSE2189-ARIN"
+            },
+            {
+              "value": "https://rdap.arin.net/registry/autnum/40575",
+              "rel": "alternate",
+              "type": "application/xml",
+              "href": "https://whois.arin.net/rest/poc/ABUSE2189-ARIN"
+            }
+          ],
+          "events": [
+            {
+              "eventAction": "last changed",
+              "eventDate": "2020-03-20T10:55:47-04:00"
+            },
+            {
+              "eventAction": "registration",
+              "eventDate": "2009-02-24T08:50:11-05:00"
+            }
+          ],
+          "port43": "whois.arin.net",
+          "objectClassName": "entity"
+        },
+        {
+          "handle": "NOC2949-ARIN",
+          "vcardArray": [
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              [
+                "adr",
+                {
+                  "label": "1201 Louisiana St., Suite 520\nHouston\nTX\n77002\nUnited States"
+                },
+                "text",
+                ["", "", "", "", "", "", ""]
+              ],
+              ["fn", {}, "text", "Network Operations Center"],
+              ["org", {}, "text", "Network Operations Center"],
+              ["kind", {}, "text", "group"],
+              ["email", {}, "text", "operations@stratosglobal.com"],
+              [
+                "tel",
+                {
+                  "type": ["work", "voice"]
+                },
+                "text",
+                "+1-337-761-2000"
+              ],
+              [
+                "tel",
+                {
+                  "type": ["work", "voice"]
+                },
+                "text",
+                "+1-800-375-1562"
+              ],
+              [
+                "tel",
+                {
+                  "type": ["work", "voice"]
+                },
+                "text",
+                "+1-832-463-2100;ext(832)463-2122"
+              ],
+              [
+                "tel",
+                {
+                  "type": ["work", "cell"]
+                },
+                "text",
+                "+1-337-761-2000"
+              ]
+            ]
+          ],
+          "roles": ["administrative"],
+          "remarks": [
+            {
+              "title": "Unvalidated POC",
+              "description": [
+                "ARIN has attempted to validate the data for this POC, but has received no response from the POC since 2015-11-06"
+              ]
+            }
+          ],
+          "links": [
+            {
+              "value": "https://rdap.arin.net/registry/autnum/40575",
+              "rel": "self",
+              "type": "application/rdap+json",
+              "href": "https://rdap.arin.net/registry/entity/NOC2949-ARIN"
+            },
+            {
+              "value": "https://rdap.arin.net/registry/autnum/40575",
+              "rel": "alternate",
+              "type": "application/xml",
+              "href": "https://whois.arin.net/rest/poc/NOC2949-ARIN"
+            }
+          ],
+          "events": [
+            {
+              "eventAction": "last changed",
+              "eventDate": "2014-11-06T09:38:09-05:00"
+            },
+            {
+              "eventAction": "registration",
+              "eventDate": "2008-01-30T15:18:19-05:00"
+            }
+          ],
+          "port43": "whois.arin.net",
+          "objectClassName": "entity"
+        }
+      ],
+      "port43": "whois.arin.net",
+      "objectClassName": "entity"
+    },
+    {
+      "handle": "NOC2949-ARIN",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          [
+            "adr",
+            {
+              "label": "1201 Louisiana St., Suite 520\nHouston\nTX\n77002\nUnited States"
+            },
+            "text",
+            ["", "", "", "", "", "", ""]
+          ],
+          ["fn", {}, "text", "Network Operations Center"],
+          ["org", {}, "text", "Network Operations Center"],
+          ["kind", {}, "text", "group"],
+          ["email", {}, "text", "operations@stratosglobal.com"],
+          [
+            "tel",
+            {
+              "type": ["work", "voice"]
+            },
+            "text",
+            "+1-337-761-2000"
+          ],
+          [
+            "tel",
+            {
+              "type": ["work", "voice"]
+            },
+            "text",
+            "+1-800-375-1562"
+          ],
+          [
+            "tel",
+            {
+              "type": ["work", "voice"]
+            },
+            "text",
+            "+1-832-463-2100;ext(832)463-2122"
+          ],
+          [
+            "tel",
+            {
+              "type": ["work", "cell"]
+            },
+            "text",
+            "+1-337-761-2000"
+          ]
+        ]
+      ],
+      "roles": ["abuse", "noc"],
+      "remarks": [
+        {
+          "title": "Unvalidated POC",
+          "description": [
+            "ARIN has attempted to validate the data for this POC, but has received no response from the POC since 2015-11-06"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "value": "https://rdap.arin.net/registry/autnum/40575",
+          "rel": "self",
+          "type": "application/rdap+json",
+          "href": "https://rdap.arin.net/registry/entity/NOC2949-ARIN"
+        },
+        {
+          "value": "https://rdap.arin.net/registry/autnum/40575",
+          "rel": "alternate",
+          "type": "application/xml",
+          "href": "https://whois.arin.net/rest/poc/NOC2949-ARIN"
+        }
+      ],
+      "events": [
+        {
+          "eventAction": "last changed",
+          "eventDate": "2014-11-06T09:38:09-05:00"
+        },
+        {
+          "eventAction": "registration",
+          "eventDate": "2008-01-30T15:18:19-05:00"
+        }
+      ],
+      "port43": "whois.arin.net",
+      "objectClassName": "entity"
+    },
+    {
+      "handle": "TECHN645-ARIN",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          [
+            "adr",
+            {
+              "label": "1201 Louisiana St., Suite 2700\nHouston\nTX\n77002\nUnited States"
+            },
+            "text",
+            ["", "", "", "", "", "", ""]
+          ],
+          ["fn", {}, "text", "Technical Assistance"],
+          ["org", {}, "text", "Technical Assistance"],
+          ["kind", {}, "text", "group"],
+          ["email", {}, "text", "operations@stratosglobal.com"],
+          ["email", {}, "text", "scott.bard@inmarsat.com"],
+          [
+            "tel",
+            {
+              "type": ["work", "voice"]
+            },
+            "text",
+            "+1-800-375-1562;ext(832)463-2154"
+          ],
+          [
+            "tel",
+            {
+              "type": ["work", "voice"]
+            },
+            "text",
+            "+1-832-463-2100"
+          ]
+        ]
+      ],
+      "roles": ["technical"],
+      "remarks": [
+        {
+          "title": "Unvalidated POC",
+          "description": [
+            "ARIN has attempted to validate the data for this POC, but has received no response from the POC since 2022-02-25"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "value": "https://rdap.arin.net/registry/autnum/40575",
+          "rel": "self",
+          "type": "application/rdap+json",
+          "href": "https://rdap.arin.net/registry/entity/TECHN645-ARIN"
+        },
+        {
+          "value": "https://rdap.arin.net/registry/autnum/40575",
+          "rel": "alternate",
+          "type": "application/xml",
+          "href": "https://whois.arin.net/rest/poc/TECHN645-ARIN"
+        }
+      ],
+      "events": [
+        {
+          "eventAction": "last changed",
+          "eventDate": "2021-02-25T10:47:47-05:00"
+        },
+        {
+          "eventAction": "registration",
+          "eventDate": "2008-01-31T09:48:20-05:00"
+        }
+      ],
+      "port43": "whois.arin.net",
+      "objectClassName": "entity"
+    }
+  ],
+  "port43": "whois.arin.net",
+  "status": ["active"],
+  "objectClassName": "autnum"
+}

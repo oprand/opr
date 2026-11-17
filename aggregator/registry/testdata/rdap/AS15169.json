@@ -1,0 +1,109 @@
+{
+  "rdapConformance": [
+    "nro_rdap_profile_0",
+    "rdap_level_0",
+    "nro_rdap_profile_asn_flat_0"
+  ],
+  "handle": "AS15169",
+  "startAutnum": 15169,
+  "endAutnum": 15169,
+  "name": "GOOGLE",
+  "objectClassName": "autnum",
+  "status": ["active"],
+  "events": [
+    {
+      "eventAction": "last changed",
+      "eventDate": "2022-04-21T16:48:14-04:00"
+    },
+    {
+      "eventAction": "registration",
+      "eventDate": "2000-03-30T00:00:00-05:00"
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.arin.net/registry/autnum/15169",
+      "rel": "self",
+      "type": "application/rdap+json",
+      "href": "https://rdap.arin.net/registry/autnum/15169"
+    }
+  ],
+  "entities": [
+    {
+      "handle": "GOGL",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "Google LLC"],
+          [
+            "adr",
+            {
+              "label": "1600 Amphitheatre Parkway\nMountain View\nCA\n94043\nUnited States"
+            },
+            "text",
+            ["", "", "", "", "", "", ""]
+          ],
+          ["kind", {}, "text", "org"]
+        ]
+      ],
+      "roles": ["registrant"],
+      "links": [
+        {
+          "value": "https://rdap.arin.net/registry/autnum/15169",
+          "rel": "self",
+          "type": "application/rdap+json",
+          "href": "https://rdap.arin.net/registry/entity/GOGL"
+        }
+      ],
+      "entities": [
+        {
+          "handle": "ABUSE5250-ARIN",
+          "vcardArray": [
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              ["fn", {}, "text", "Abuse"],
+              ["org", {}, "text", "Abuse"],
+              ["kind", {}, "text", "group"],
+              ["email", {}, "text", "abuse@google.com"]
+            ]
+          ],
+          "roles": ["abuse"],
+          "links": [
+            {
+              "value": "https://rdap.arin.net/registry/autnum/15169",
+              "rel": "self",
+              "type": "application/rdap+json",
+              "href": "https://rdap.arin.net/registry/entity/ABUSE5250-ARIN"
+            }
+          ],
+          "objectClassName": "entity"
+        },
+        {
+          "handle": "ZG39-ARIN",
+          "vcardArray": [
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              ["fn", {}, "text", "Google LLC"],
+              ["kind", {}, "text", "group"],
+              ["email", {}, "text", "arin-contact@google.com"]
+            ]
+          ],
+          "roles": ["administrative", "technical"],
+          "links": [
+            {
+              "value": "https://rdap.arin.net/registry/autnum/15169",
+              "rel": "self",
+              "type": "application/rdap+json",
+              "href": "https://rdap.arin.net/registry/entity/ZG39-ARIN"
+            }
+          ],
+          "objectClassName": "entity"
+        }
+      ],
+      "objectClassName": "entity"
+    }
+  ]
+}
