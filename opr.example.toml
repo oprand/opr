@@ -1,0 +1,156 @@
+# opr daemon configuration.
+#
+# Copy this file to ~/.config/opr.config.toml (or pass `opr run --config PATH`,
+# or set OPR_CONFIG=PATH). `opr run` takes no other flag.
+#
+# OPR_DSN, OPR_CLICKHOUSE_PASSWORD, and OPR_PEERINGDB_APIKEY stay environment-only:
+#   OPR_DSN                  Postgres connection string (required for `opr run`)
+#   OPR_CLICKHOUSE_PASSWORD  ClickHouse password (fdns.ingest-cc, fdns.seed-queue)
+#   OPR_PEERINGDB_APIKEY     PeeringDB API key (optional private overlay)
+# A key named dsn, password, apikey, or clickhouse-password anywhere in this
+# file is an error.
+#
+# A [registry-crawl.worker] proxy URL may contain user:pass. chmod 600 the file
+# you actually run and do not commit it. The default path
+# ~/.config/opr.config.toml is outside the repo; the same rule applies if
+# --config points at a path git can see. This example keeps proxies empty.
+#
+# Every job table has `enabled`. Omitted means true. Omitted keys keep the
+# one-shot flag defaults, so an empty file runs the whole daemon with defaults.
+# Unknown keys are errors. Durations are strings parsed by Go's
+# time.ParseDuration ("24h", "2m", "1h30m").
+#
+# Section names match CLI syntax: [command] or [command.subcommand]
+# (e.g. registry-crawl worker → [registry-crawl.worker]).
+#
+# Periodic jobs run once at start, then wait `interval` after each run.
+# Queue jobs (registry-crawl.worker, fdns.resolve, rdns.crawl-ptr,
+# geoip.crawl-geofeeds) run until SIGINT/SIGTERM.
+
+[registry-crawl.worker]
+enabled = true          # was --aut-num-fetch; crawl_target kind autnum
+ipnet = true            # was --route-fetch; crawl_target kind ipnet
+only-registries = []    # empty = ARIN+LACNIC, same as today
+include-bulk-gaps = false
+lease = "2m"
+batch = 1
+# user:pass is allowed in a proxy URL. Keep this empty here; put credentials
+# only in the chmod 600 file you run, and do not commit that file.
+proxies = []
+
+[registry-crawl.seed]
+enabled = true
+interval = "24h"
+skip-ribs = false
+only-registries = []        # empty = all five
+delegated-stats-url = "https://ftp.ripe.net/pub/stats/ripencc/nro-stats/latest/nro-delegated-stats"
+
+[registry-crawl.bulk]
+enabled = true
+period = "1h"
+buffer-max-size = 5000
+with-route-objects = true   # current --with-whoisdb-route-fetch; IRR routes, not RDAP
+prefetch = 3
+asnames-url = "https://ftp.ripe.net/ripe/asnames/asn.txt"
+
+[geonames]
+enabled = true
+interval = "24h"
+
+[peeringdb]
+enabled = true
+interval = "24h"
+force = false               # API key is OPR_PEERINGDB_APIKEY, never this file
+
+[aspop]
+enabled = true
+interval = "6h"
+
+[geoip.lacnic]
+enabled = true
+interval = "24h"
+
+[geoip.ipmap]
+enabled = true
+interval = "24h"
+force = false               # true ignores the stored IPmap ETag
+
+[geoip.anycast]
+enabled = true
+interval = "24h"
+force = false               # true ignores the stored anycast ETag
+
+[geoip.crawl-geofeeds]
+enabled = true
+geofeed-refresh-older-than = "168h"
+worker-count = 10
+
+[rpki.ingest]
+enabled = true
+interval = "1h"
+routinator-addr = "http://127.0.0.1:8323"
+routinator-fallback-addr = ""
+
+[fdns.ingest-lists]
+enabled = true
+interval = "24h"
+only = []                   # empty = tranco, umbrella, crux
+# tranco-url = "https://tranco-list.eu/top-1m.csv.zip"
+# umbrella-url = "https://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip"
+# crux-url = "https://raw.githubusercontent.com/zakird/crux-top-lists/main/data/global/current.csv.gz"
+
+[fdns.resolve]
+enabled = true              # continuous queue, not a sleep loop
+# Five public recursives. Copying this file must not point at a resolver
+# that is not running. On macOS, `make localunbound` publishes Unbound at
+# 127.0.0.1:5353; uncomment that line and comment the public set to use it.
+resolver = ["1.1.1.1", "8.8.8.8", "9.9.9.9", "208.67.222.222", "74.82.42.42"]
+# resolver = ["127.0.0.1:5353"]
+qps = 500.0
+af = "both"
+lease = "5m"
+batch = 256
+timeout = "5s"
+
+[fdns.ingest-cc]
+enabled = true              # ~7–9 GiB parquet; ClickHouse ceiling is 16g
+interval = "720h"
+keep-parquet = true
+# parquet-dir = ""          # default: UserCacheDir/opr/cc-host-index
+# crawl = ""                # default: latest crawl id in Host Index v2.paths.gz
+
+[fdns.seed-queue]
+enabled = true
+interval = "24h"
+limit = 5000000
+queue-high-water = 0
+order = "key"
+min-fetch-200 = 0
+min-hcrank10 = 0.0
+min-prank10 = 0.0
+tld = []
+crawl = ""
+stale-after = "168h"
+
+[rdns.ingest]
+enabled = true
+interval = "24h"
+only-registries = []
+skip-iana = false
+skip-whois = false
+skip-lacnic-whois = false
+# ripe-url, apnic-url, arin-url, afrinic-url, lacnic-url, iana-inaddr-url,
+# iana-ip6-url, ripe-domain-url, apnic-domain-url, afrinic-db-url, lacnic-db-url
+# override the same URLs as the `rdns ingest` flags.
+
+[rdns.crawl-ptr]
+enabled = true              # continuous /24 block queue
+qps = 5.0
+timeout = "2s"
+only-registries = []
+
+[clickhouse]
+url = "http://127.0.0.1:8123"   # OPR_CLICKHOUSE_URL overrides this; password is OPR_CLICKHOUSE_PASSWORD
+database = "opr"
+user = "default"
+timeout = "30m"

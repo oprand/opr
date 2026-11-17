@@ -5,7 +5,7 @@ logs/
 
 # Ignore eventual prod config files, but not the example config file.
 *.toml
-!opr.config.toml
+!opr.example.toml
 
 # Ignore env var
 .env
