@@ -1,0 +1,197 @@
+{
+  "rdapConformance": [
+    "history_version_0",
+    "nro_rdap_profile_0",
+    "nro_rdap_profile_asn_hierarchical_0",
+    "cidr0",
+    "rdap_level_0"
+  ],
+  "notices": [
+    {
+      "title": "Source",
+      "description": ["Objects returned came from source", "APNIC"]
+    },
+    {
+      "title": "Terms and Conditions",
+      "description": [
+        "This is the APNIC WHOIS Database query service. The objects are in RDAP format."
+      ],
+      "links": [
+        {
+          "value": "https://rdap.apnic.net/autnum/138371",
+          "rel": "terms-of-service",
+          "href": "http://www.apnic.net/db/dbcopyright.html",
+          "type": "text/html"
+        }
+      ]
+    },
+    {
+      "title": "Whois Inaccuracy Reporting",
+      "description": ["If you see inaccuracies in the results, please visit: "],
+      "links": [
+        {
+          "value": "https://rdap.apnic.net/autnum/138371",
+          "rel": "inaccuracy-report",
+          "href": "https://www.apnic.net/manage-ip/using-whois/abuse-and-spamming/invalid-contact-form",
+          "type": "text/html"
+        }
+      ]
+    }
+  ],
+  "country": "CN",
+  "events": [
+    { "eventAction": "registration", "eventDate": "2018-10-24T06:27:42Z" },
+    { "eventAction": "last changed", "eventDate": "2020-09-03T09:16:08Z" }
+  ],
+  "name": "CNGI-QDA-IX-AS-AP",
+  "remarks": [
+    {
+      "description": [
+        "CERNET2 regional IX at Ocean University of China",
+        "CERNET Center",
+        "Beijing 100084, China"
+      ],
+      "title": "description"
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.apnic.net/autnum/138371",
+      "rel": "self",
+      "href": "https://rdap.apnic.net/autnum/138371",
+      "type": "application/rdap+json"
+    },
+    {
+      "value": "https://rdap.apnic.net/autnum/138371",
+      "rel": "related",
+      "href": "https://netox.apnic.net/search/AS138371?utm_source=rdap&utm_medium=result&utm_campaign=rdap_result",
+      "type": "text/html"
+    }
+  ],
+  "status": ["active"],
+  "handle": "AS138371",
+  "endAutnum": 138371,
+  "startAutnum": 138371,
+  "objectClassName": "autnum",
+  "entities": [
+    {
+      "roles": ["technical", "administrative"],
+      "events": [
+        { "eventAction": "registration", "eventDate": "2008-09-04T07:54:16Z" },
+        { "eventAction": "last changed", "eventDate": "2020-09-03T09:14:12Z" }
+      ],
+      "remarks": [
+        { "description": ["abuse@cernet.edu.cn"], "title": "remarks" }
+      ],
+      "links": [
+        {
+          "value": "https://rdap.apnic.net/autnum/138371",
+          "rel": "self",
+          "href": "https://rdap.apnic.net/entity/CER-AP",
+          "type": "application/rdap+json"
+        }
+      ],
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "CERNET Helpdesk"],
+          ["kind", {}, "text", "group"],
+          [
+            "adr",
+            { "label": "CERNET Center\nBeijing 100084, China" },
+            "text",
+            ["", "", "", "", "", "", ""]
+          ],
+          ["tel", { "type": "voice" }, "text", "+86-10-6278-4049"],
+          ["tel", { "type": "fax" }, "text", "+86-10-6278-5933"],
+          ["email", {}, "text", "helpdesk@cernet.edu.cn"]
+        ]
+      ],
+      "objectClassName": "entity",
+      "handle": "CER-AP"
+    },
+    {
+      "roles": ["abuse"],
+      "events": [
+        { "eventAction": "registration", "eventDate": "2010-11-26T03:14:01Z" },
+        { "eventAction": "last changed", "eventDate": "2022-04-21T09:47:58Z" }
+      ],
+      "remarks": [
+        {
+          "description": [
+            "timezone GMT+8",
+            "http://www.ccert.edu.cn",
+            "abuse@cernet.edu.cn was validated on 2022-04-21"
+          ],
+          "title": "remarks"
+        }
+      ],
+      "links": [
+        {
+          "value": "https://rdap.apnic.net/autnum/138371",
+          "rel": "self",
+          "href": "https://rdap.apnic.net/entity/IRT-CERNET-AP",
+          "type": "application/rdap+json"
+        }
+      ],
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "IRT-CERNET-AP"],
+          ["kind", {}, "text", "group"],
+          [
+            "adr",
+            {
+              "label": "Network Research Center,\nMain Bldg, Tsinghua Univ\nBeijing 100084, China"
+            },
+            "text",
+            ["", "", "", "", "", "", ""]
+          ],
+          ["tel", { "type": "voice" }, "text", "+86-10-62784301"],
+          ["tel", { "type": "fax" }, "text", "+86-10-62785933"],
+          ["email", {}, "text", "abuse@cernet.edu.cn"],
+          ["email", { "pref": "1" }, "text", "abuse@cernet.edu.cn"]
+        ]
+      ],
+      "objectClassName": "entity",
+      "handle": "IRT-CERNET-AP"
+    },
+    {
+      "roles": ["registrant"],
+      "events": [
+        { "eventAction": "registration", "eventDate": "2017-12-20T12:57:07Z" },
+        { "eventAction": "last changed", "eventDate": "2018-09-13T12:56:34Z" }
+      ],
+      "links": [
+        {
+          "value": "https://rdap.apnic.net/autnum/138371",
+          "rel": "self",
+          "href": "https://rdap.apnic.net/entity/ORG-CEAR1-AP",
+          "type": "application/rdap+json"
+        }
+      ],
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "China Education and Research Network (CERNET)"],
+          ["kind", {}, "text", "org"],
+          [
+            "adr",
+            { "label": "FIT 3-220,\nTsinghua University" },
+            "text",
+            ["", "", "", "", "", "", ""]
+          ],
+          ["tel", { "type": "voice" }, "text", "+86-10-62785983"],
+          ["tel", { "type": "fax" }, "text", "+86-10-62785933"],
+          ["email", {}, "text", "hostmaster@cernic.net"]
+        ]
+      ],
+      "objectClassName": "entity",
+      "handle": "ORG-CEAR1-AP"
+    }
+  ],
+  "port43": "whois.apnic.net"
+}

@@ -1,0 +1,475 @@
+{
+  "lang": "en",
+  "notices": [
+    {
+      "title": "ABOUT",
+      "description": ["This is the AfriNIC RDAP server."],
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/autnum/6968",
+          "rel": "describedby",
+          "href": "https://www.afrinic.net/support/whois-db/reference-manual",
+          "hreflang": ["en"],
+          "type": "text/html",
+          "title": "AFRINIC Database Reference Manual",
+          "media": "screen"
+        }
+      ]
+    },
+    {
+      "title": "Terms and Conditions",
+      "description": [
+        "This is the AFRINIC Database query service. The objects are in RDAP format."
+      ],
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/autnum/6968",
+          "rel": "terms-of-service",
+          "href": "https://afrinic.net/whois/terms",
+          "type": "text/html"
+        }
+      ]
+    },
+    {
+      "title": "Whois Inaccuracy Reporting",
+      "links": [
+        {
+          "href": "https://www.afrinic.net/support/whois-db/reference-manual",
+          "title": "AFRINIC WHOIS Inaccuracy Report"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.afrinic.net/rdap/autnum/AS6968",
+      "rel": "self",
+      "href": "https://rdap.afrinic.net/rdap/autnum/AS6968"
+    }
+  ],
+  "handle": "AS6968",
+  "events": [
+    {
+      "eventAction": "registration",
+      "eventDate": "2005-02-21T15:31:00Z"
+    },
+    {
+      "eventAction": "last changed",
+      "eventDate": "2017-01-24T08:25:00Z"
+    }
+  ],
+  "status": ["active"],
+  "port43": "whois.afrinic.net",
+  "name": "ORG-US7-AFRINIC",
+  "entities": [
+    {
+      "lang": "en",
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/entity/LM35-AFRINIC",
+          "rel": "self",
+          "href": "https://rdap.afrinic.net/rdap/entity/LM35-AFRINIC"
+        }
+      ],
+      "handle": "LM35-AFRINIC",
+      "status": ["active"],
+      "port43": "whois.afrinic.net",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["kind", {}, "text", "individual"],
+          ["fn", {}, "text", "Lucky Masilela"],
+          [
+            "tel",
+            {
+              "label": "PO Box 4620\nHalfway House\nGauteng\n1685\nZA\nMidrand 1658\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-11-314-0077"
+          ],
+          [
+            "tel",
+            {
+              "label": "PO Box 4620\nHalfway House\nGauteng\n1685\nZA\nMidrand 1658\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-11-314-0088"
+          ],
+          [
+            "email",
+            {
+              "label": "PO Box 4620\nHalfway House\nGauteng\n1685\nZA\nMidrand 1658\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            "lmasilela@registry.net.za"
+          ],
+          [
+            "adr",
+            {
+              "label": "PO Box 4620\nHalfway House\nGauteng\n1685\nZA\nMidrand 1658\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            [
+              "PO Box 4620",
+              "Halfway House",
+              "Gauteng",
+              "1685",
+              "ZA",
+              "Midrand 1658",
+              "South Africa"
+            ]
+          ]
+        ]
+      ],
+      "roles": ["administrative"],
+      "objectClassName": "entity"
+    },
+    {
+      "lang": "en",
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/entity/MJE-AFRINIC",
+          "rel": "self",
+          "href": "https://rdap.afrinic.net/rdap/entity/MJE-AFRINIC"
+        }
+      ],
+      "handle": "MJE-AFRINIC",
+      "status": ["active"],
+      "port43": "whois.afrinic.net",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["kind", {}, "text", "individual"],
+          ["fn", {}, "text", "Mark Elkins"],
+          [
+            "tel",
+            {
+              "label": "Posix Systems (Pty) Ltd\nP O Box 73892\nGauteng\nLynnwood Ridge 0040\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-12-807-0590"
+          ],
+          [
+            "tel",
+            {
+              "label": "Posix Systems (Pty) Ltd\nP O Box 73892\nGauteng\nLynnwood Ridge 0040\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-82-601-0496"
+          ],
+          [
+            "tel",
+            {
+              "label": "Posix Systems (Pty) Ltd\nP O Box 73892\nGauteng\nLynnwood Ridge 0040\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-12-807-5324"
+          ],
+          [
+            "email",
+            {
+              "label": "Posix Systems (Pty) Ltd\nP O Box 73892\nGauteng\nLynnwood Ridge 0040\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            "mje@posix.co.za"
+          ],
+          [
+            "adr",
+            {
+              "label": "Posix Systems (Pty) Ltd\nP O Box 73892\nGauteng\nLynnwood Ridge 0040\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            [
+              "Posix Systems (Pty) Ltd",
+              "P O Box 73892",
+              "Gauteng",
+              "Lynnwood Ridge 0040",
+              "South Africa",
+              "",
+              ""
+            ]
+          ]
+        ]
+      ],
+      "roles": ["administrative", "technical"],
+      "objectClassName": "entity"
+    },
+    {
+      "lang": "en",
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/entity/ORG-US7-AFRINIC",
+          "rel": "self",
+          "href": "https://rdap.afrinic.net/rdap/entity/ORG-US7-AFRINIC"
+        }
+      ],
+      "handle": "ORG-US7-AFRINIC",
+      "status": ["active"],
+      "port43": "whois.afrinic.net",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["kind", {}, "text", "org"],
+          ["fn", {}, "text", "ZA CENTRAL REGISTRY NPC"],
+          [
+            "tel",
+            {
+              "label": "P O Box 4620\nHalfway House 1685",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-11-314-0077"
+          ],
+          [
+            "tel",
+            {
+              "label": "P O Box 4620\nHalfway House 1685",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-11-314-0088"
+          ],
+          [
+            "email",
+            {
+              "label": "P O Box 4620\nHalfway House 1685",
+              "type": "work"
+            },
+            "text",
+            "techsupport@co.za"
+          ],
+          [
+            "adr",
+            {
+              "label": "P O Box 4620\nHalfway House 1685",
+              "type": "work"
+            },
+            "text",
+            ["P O Box 4620", "Halfway House 1685", "", "", "", "", ""]
+          ]
+        ]
+      ],
+      "roles": ["registrant"],
+      "objectClassName": "entity"
+    },
+    {
+      "lang": "en",
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/entity/JL20-AFRINIC",
+          "rel": "self",
+          "href": "https://rdap.afrinic.net/rdap/entity/JL20-AFRINIC"
+        }
+      ],
+      "handle": "JL20-AFRINIC",
+      "status": ["active"],
+      "port43": "whois.afrinic.net",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["kind", {}, "text", "individual"],
+          ["fn", {}, "text", "Jannie Labuschagne"],
+          [
+            "tel",
+            {
+              "label": "PO Box 4620\nHalfway House\nGauteng\n1685\nZA",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-11-314-0077"
+          ],
+          [
+            "tel",
+            {
+              "label": "PO Box 4620\nHalfway House\nGauteng\n1685\nZA",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-11-314-0088"
+          ],
+          [
+            "email",
+            {
+              "label": "PO Box 4620\nHalfway House\nGauteng\n1685\nZA",
+              "type": "work"
+            },
+            "text",
+            "jannie@registry.net.za"
+          ],
+          [
+            "adr",
+            {
+              "label": "PO Box 4620\nHalfway House\nGauteng\n1685\nZA",
+              "type": "work"
+            },
+            "text",
+            ["PO Box 4620", "Halfway House", "Gauteng", "1685", "ZA", "", ""]
+          ]
+        ]
+      ],
+      "roles": ["administrative"],
+      "objectClassName": "entity"
+    },
+    {
+      "lang": "en",
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/entity/SB42-AFRINIC",
+          "rel": "self",
+          "href": "https://rdap.afrinic.net/rdap/entity/SB42-AFRINIC"
+        }
+      ],
+      "handle": "SB42-AFRINIC",
+      "status": ["active"],
+      "port43": "whois.afrinic.net",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["kind", {}, "text", "individual"],
+          ["fn", {}, "text", "Simla Budhu"],
+          [
+            "tel",
+            {
+              "label": "PO Box 4620\nHalfway House\nGauteng\n1685\nZA",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-11-314-0077"
+          ],
+          [
+            "tel",
+            {
+              "label": "PO Box 4620\nHalfway House\nGauteng\n1685\nZA",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-11-314-0088"
+          ],
+          [
+            "email",
+            {
+              "label": "PO Box 4620\nHalfway House\nGauteng\n1685\nZA",
+              "type": "work"
+            },
+            "text",
+            "simla@registry.net.za"
+          ],
+          [
+            "adr",
+            {
+              "label": "PO Box 4620\nHalfway House\nGauteng\n1685\nZA",
+              "type": "work"
+            },
+            "text",
+            ["PO Box 4620", "Halfway House", "Gauteng", "1685", "ZA", "", ""]
+          ]
+        ]
+      ],
+      "roles": ["administrative"],
+      "objectClassName": "entity"
+    },
+    {
+      "lang": "en",
+      "links": [
+        {
+          "value": "https://rdap.afrinic.net/rdap/entity/DKP-AFRINIC",
+          "rel": "self",
+          "href": "https://rdap.afrinic.net/rdap/entity/DKP-AFRINIC"
+        }
+      ],
+      "handle": "DKP-AFRINIC",
+      "status": ["active"],
+      "port43": "whois.afrinic.net",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["kind", {}, "text", "individual"],
+          ["fn", {}, "text", "David Peall"],
+          [
+            "tel",
+            {
+              "label": "P O Box 4620\nHalfway House\nGauteng\n1685\nZA\nJohannesburg 1685\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-11-314-0077"
+          ],
+          [
+            "tel",
+            {
+              "label": "P O Box 4620\nHalfway House\nGauteng\n1685\nZA\nJohannesburg 1685\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-83-475-3434"
+          ],
+          [
+            "tel",
+            {
+              "label": "P O Box 4620\nHalfway House\nGauteng\n1685\nZA\nJohannesburg 1685\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            "tel:+27-11-314-0088"
+          ],
+          [
+            "email",
+            {
+              "label": "P O Box 4620\nHalfway House\nGauteng\n1685\nZA\nJohannesburg 1685\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            "dkpeall@gmail.com"
+          ],
+          [
+            "email",
+            {
+              "label": "P O Box 4620\nHalfway House\nGauteng\n1685\nZA\nJohannesburg 1685\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            "david@dns.business"
+          ],
+          [
+            "adr",
+            {
+              "label": "P O Box 4620\nHalfway House\nGauteng\n1685\nZA\nJohannesburg 1685\nSouth Africa",
+              "type": "work"
+            },
+            "text",
+            [
+              "P O Box 4620",
+              "Halfway House",
+              "Gauteng",
+              "1685",
+              "ZA",
+              "Johannesburg 1685",
+              "South Africa"
+            ]
+          ]
+        ]
+      ],
+      "roles": ["administrative", "technical"],
+      "objectClassName": "entity"
+    }
+  ],
+  "startAutnum": 6968,
+  "endAutnum": 6968,
+  "objectClassName": "autnum",
+  "rdapConformance": ["rdap_level_0, nro_rdap_profile_0, cidr0"]
+}

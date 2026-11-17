@@ -1,0 +1,29 @@
+{
+  "rdapConformance": [
+    "rdap_level_0",
+    "cidr0"
+  ],
+  "handle": "NET-192-0-2-0-CIDR0",
+  "ipVersion": "v4",
+  "name": "CIDR0-ONLY",
+  "type": "ASSIGNED",
+  "status": ["active"],
+  "objectClassName": "ip network",
+  "cidr0_cidrs": [
+    {
+      "v4prefix": "192.0.2.128",
+      "length": 25
+    },
+    {
+      "v4prefix": "192.0.2.0",
+      "length": 25
+    }
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/rdap+json",
+      "href": "https://rdap.arin.net/registry/ip/192.0.2.0/24"
+    }
+  ]
+}

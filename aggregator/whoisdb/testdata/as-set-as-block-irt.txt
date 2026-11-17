@@ -1,0 +1,47 @@
+as-set:         AS-CLOUDFLARE
+descr:          Cloudflare AS set
+members:        AS13335
+members:        AS-FOO
+mbrs-by-ref:    MAINT-CLOUDFLARE
+tech-c:         CF1-AP
+admin-c:        CF1-AP
+mnt-by:         MAINT-CLOUDFLARE
+source:         APNIC
+
+as-block:       AS37945 - AS37950
+descr:          CNNIC ASN block
+country:        CN
+org:            ORG-CNNIC-AP
+admin-c:        HM20-AP
+tech-c:         HM20-AP
+mnt-by:         APNIC-HM
+mnt-lower:      MAINT-CNNIC-AP
+source:         APNIC
+
+irt:            IRT-APNICRANDNET-AU
+address:        PO Box 3646
+e-mail:         helpdesk@apnic.net
+abuse-mailbox:  abuse@example.net
+admin-c:        HM20-AP
+tech-c:         HM20-AP
+auth:           PGPKEY-23F0C2B5
+mnt-by:         APNIC-HM
+source:         APNIC
+
+as-set:         AS-AFRINIC-TEST
+descr:          AFRINIC mixed dump as-set
+members:        AS36885
+mnt-by:         AFRINIC-HM-MNT
+source:         AFRINIC
+
+mntner:         MAINT-EXAMPLE
+descr:          unknown type must be ignored
+admin-c:        HM20-AP
+mnt-by:         AFRINIC-HM-MNT
+source:         AFRINIC
+
+route:          196.192.103.0/24
+descr:          pass-1 must drop route objects
+origin:         AS36885
+mnt-by:         AFRINIC-HM-MNT
+source:         AFRINIC

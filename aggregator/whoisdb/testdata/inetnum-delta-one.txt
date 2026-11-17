@@ -1,0 +1,21 @@
+inetnum:        196.32.192.110 - 196.32.192.111
+netname:        MULTITEL-NETWORK
+descr:          Provider Local Registry
+descr:          Multitel-Servicos de Telecomunicacoes Lda
+country:        EG
+admin-c:        AG58-AFRINIC
+admin-c:        MI49-AFRINIC
+tech-c:         AG58-AFRINIC
+tech-c:         MI49-AFRINIC
+tech-c:         SL13-AFRINIC
+org:            ORG-MST1-AFRINIC
+status:         ALLOCATED PA
+mnt-by:         AFRINIC-HM-MNT
+mnt-lower:      MULTITEL-MNT
+notify:         ***@multitel.co.ao
+notify:         ***@multitel.co.ao
+notify:         ***@multitel.co.ao
+changed:        ***@afrinic.net 20051207
+changed:        ***@afrinic.net 20140513
+changed:        ***@afrinic.net 20211023
+source:         AFRINIC

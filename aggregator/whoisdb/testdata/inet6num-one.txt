@@ -1,0 +1,17 @@
+inet6num:       2001:4300::/32
+netname:        EG-CAIX-20041214
+descr:          Ministry of Communications and Information Technology
+country:        EG
+org:            ORG-MoCa1-AFRINIC
+admin-c:        HZEN72
+tech-c:         HZEN72
+status:         ALLOCATED-BY-RIR
+remarks:        data has been transferred from RIPE Whois Database 20050221
+notify:         ***@mcit.gov.eg
+mnt-by:         AFRINIC-HM-MNT
+mnt-lower:      CAIX-MNT
+mnt-routes:     CAIX-MNT
+changed:        ***@ripe.net 20041214
+changed:        ***@afrinic.net 20050205
+changed:        ***@afrinic.net 20141015
+source:         AFRINIC

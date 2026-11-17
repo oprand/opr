@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 2
+
+project_name: opr
+
+builds:
+  - id: opr
+    main: ./cmd/opr
+    binary: opr
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -buildid= -X github.com/oprand/opr/internal/version.GitCommitHash={{ .FullCommit }}
+
+archives:
+  - formats: [tar.gz]
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- .Os }}_
+      {{- .Arch }}
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+signs:
+  - artifacts: checksum
+    args:
+      - --batch
+      - -u
+      - "{{ .Env.GPG_FINGERPRINT }}"
+      - --output
+      - "${signature}"
+      - --detach-sign
+      - "${artifact}"
+
+dockers_v2:
+  - images:
+      - ghcr.io/oprand/opr
+    tags:
+      - "{{ .Tag }}"
+      - '{{ if and (not .IsNightly) (not .Prerelease) }}latest{{ end }}'
+    dockerfile: Dockerfile
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    flags:
+      - "--target=goreleaser"
+    labels:
+      org.opencontainers.image.source: "https://github.com/oprand/opr"
+      org.opencontainers.image.title: "{{ .ProjectName }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.version: "{{ .Version }}"
+
+changelog:
+  use: github
+  sort: asc

@@ -1,0 +1,73 @@
+inet6num:       2001:4200::/23
+netname:        AFRINIC-V6-NET
+descr:          v6 block for allocation to African organisations
+country:        MU
+org:            ORG-AFNC1-AFRINIC
+admin-c:        TEAM-AFRINIC
+tech-c:         TEAM-AFRINIC
+status:         ALLOCATED UNSPECIFIED
+notify:         ***@afrinic.net
+mnt-by:         AFRINIC-HM-MNT
+mnt-domains:    AFRINIC-IT-MNT
+changed:        ***@afrinic.net 20051021
+changed:        ***@afrinic.net 20180525
+source:         AFRINIC
+
+inet6num:       2001:4200::/32
+netname:        TENET-IPV6-1
+descr:          Provider Local Registry
+descr:          Tertiary Education Network
+country:        ZA
+org:            ORG-UP1-AFRINIC
+admin-c:        ADMN2018-AFRINIC
+tech-c:         TC2018-AFRINIC
+tech-c:         PS28-AFRINIC
+status:         ALLOCATED-BY-RIR
+notify:         ***@tenet.ac.za
+notify:         ***@tenet.ac.za
+notify:         ***@tenet.ac.za
+notify:         ***@tenet.ac.za
+notify:         ***@tenet.ac.za
+notify:         ***@tenet.ac.za
+mnt-by:         AFRINIC-HM-MNT
+mnt-lower:      TNET-MNT01
+mnt-domains:    TNET-MNT01
+changed:        ***@afrinic.net 20051021
+changed:        ***@afrinic.net 20130620
+changed:        ***@afrinic.net 20180605
+changed:        ***@afrinic.net 20181226
+changed:        ***@afrinic.net 20191211
+source:         AFRINIC
+
+inet6num:       2001:4200:1000::/48
+netname:        BORTECH-IPV6-1
+descr:          Walter Sisulu University
+descr:          Old Berlin Road
+descr:          Fort Jackson
+descr:          East London
+descr:          5200
+country:        ZA
+admin-c:        CJ124-AFRINIC
+tech-c:         CJ124-AFRINIC
+status:         ASSIGNED PA
+mnt-by:         TF-192-96-MNT
+mnt-lower:      TF-192-96-MNT
+notify:         ***@tenet.ac.za
+changed:        ***@tenet.ac.za 20051207
+source:         AFRINIC
+
+inet6num:       2001:4200:5000::/48
+netname:        UFS-IPV6-1
+descr:          University of the Free State
+descr:          Zastron Street Ext
+descr:          Bloemfontein
+descr:          9300
+country:        ZA
+admin-c:        HJ107-AFRINIC
+tech-c:         HJ107-AFRINIC
+status:         ASSIGNED PA
+mnt-by:         TF-192-96-MNT
+mnt-lower:      TF-192-96-MNT
+notify:         ***@tenet.ac.za
+changed:        ***@tenet.ac.za 20051207
+source:         AFRINIC

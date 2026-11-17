@@ -1,0 +1,36 @@
+{
+  "objectClassName": "autnum",
+  "handle": "AS37945 - AS37950",
+  "startAutnum": 37945,
+  "endAutnum": 37950,
+  "country": "CN",
+  "status": ["active"],
+  "remarks": [
+    {
+      "title": "description",
+      "description": ["CNNIC ASN block"]
+    },
+    {
+      "title": "remarks",
+      "description": [
+        "These AS numbers are further assigned by CNNIC",
+        "to CNNIC members and end-users in China"
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "handle": "IPAS1-AP",
+      "objectClassName": "entity",
+      "roles": ["technical", "administrative"],
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "CNNIC IPAS CONFEDERATION"],
+          ["kind", {}, "text", "group"]
+        ]
+      ]
+    }
+  ]
+}

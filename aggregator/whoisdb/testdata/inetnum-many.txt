@@ -1,0 +1,74 @@
+inetnum:        196.192.103.0 - 196.192.103.255
+netname:        MauritiusTelecom
+descr:          MauritiusTelecom
+country:        MU
+admin-c:        YR6-AFRINIC
+tech-c:         JL279-AFRINIC
+org:            org-sa56-afrinic
+status:         ASSIGNED PA
+mnt-by:         MU-TELECOMPLUS-MNT
+remarks:        MauritiusTelecom
+notify:         ***@mauritiustelecom.com
+changed:        ***@intnet.mu 20051207
+changed:        ***@mauritiustelecom.com 20130710
+source:         AFRINIC
+
+inetnum:        196.192.104.0 - 196.192.111.255
+netname:        MauritiusTelecom
+descr:          MauritiusTelecom
+country:        ZA
+admin-c:        YR6-AFRINIC
+tech-c:         JL279-AFRINIC
+org:            org-sa56-afrinic
+status:         ASSIGNED PA
+mnt-by:         MU-TELECOMPLUS-MNT
+remarks:        MauritiusTelecom
+notify:         ***@mauritiustelecom.com
+changed:        ***@intnet.mu 20051207
+changed:        ***@mauritiustelecom.com 20130710
+source:         AFRINIC
+
+
+
+inetnum:        196.223.0.0 - 196.223.0.0
+netname:        MIXP
+descr:          ---------------------------------
+descr:          Mauritius Internet Exchange Point
+descr:          ---------------------------------
+country:        ZW
+admin-c:        RS24-AFRINIC
+admin-c:        GR15-AFRINIC
+tech-c:         MIXP127-AFRINIC
+tech-c:         FOK11-AFRINIC
+org:            ORG-MIXP1-AFRINIC
+status:         ASSIGNED PI
+mnt-by:         AFRINIC-HM-MNT
+mnt-lower:      MIXP-MNT
+mnt-domains:    MIXP-MNT
+mnt-routes:     MIXP-MNT
+notify:         ***@dcl.mu
+notify:         ***@cybernaptics.mu
+notify:         ***@afrinic.net
+notify:         ***@mixp.org
+changed:        ***@afrinic.net 20051210
+changed:        ***@afrinic.net 20110621
+changed:        ***@afrinic.net 20121030
+changed:        ***@afrinic.net 20140721
+changed:        ***@afrinic.net 20140904
+changed:        ***@afrinic.net 20180619
+changed:        ***@afrinic.net 20200406
+source:         AFRINIC
+
+aut-num:        AS36885
+as-name:        Internet2
+descr:          Egyptian MCIT Internet2
+status:         ASSIGNED
+org:            ORG-MoCa1-AFRINIC
+admin-c:        HZEN72
+tech-c:         HZEN72
+mnt-lower:      CAIX-MNT
+mnt-routes:     CAIX-MNT
+mnt-by:         AFRINIC-HM-MNT
+changed:        ***@afrinic.net 20060104
+changed:        ***@afrinic.net 20141015
+source:         AFRINIC

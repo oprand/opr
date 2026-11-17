@@ -1,0 +1,167 @@
+inetnum:        196.192.103.0 - 196.192.103.255
+netname:        MauritiusTelecom
+descr:          MauritiusTelecom
+country:        MU
+admin-c:        YR6-AFRINIC
+tech-c:         JL279-AFRINIC
+org:            org-sa56-afrinic
+status:         ASSIGNED PA
+mnt-by:         MU-TELECOMPLUS-MNT
+remarks:        MauritiusTelecom
+notify:         ***@mauritiustelecom.com
+changed:        ***@intnet.mu 20051207
+changed:        ***@mauritiustelecom.com 20130710
+source:         AFRINIC
+
+inet6num:       2001:4200:1000::/48
+netname:        BORTECH-IPV6-1
+descr:          Walter Sisulu University
+descr:          Old Berlin Road
+descr:          Fort Jackson
+descr:          East London
+descr:          5200
+country:        ZA
+admin-c:        CJ124-AFRINIC
+tech-c:         CJ124-AFRINIC
+status:         ASSIGNED PA
+mnt-by:         TF-192-96-MNT
+mnt-lower:      TF-192-96-MNT
+notify:         ***@tenet.ac.za
+changed:        ***@tenet.ac.za 20051207
+source:         AFRINIC
+
+inetnum:        196.192.104.0 - 196.192.111.255
+netname:        MauritiusTelecom
+descr:          MauritiusTelecom
+country:        ZA
+admin-c:        YR6-AFRINIC
+tech-c:         JL279-AFRINIC
+org:            org-sa56-afrinic
+status:         ASSIGNED PA
+mnt-by:         MU-TELECOMPLUS-MNT
+remarks:        MauritiusTelecom
+notify:         ***@mauritiustelecom.com
+changed:        ***@intnet.mu 20051207
+changed:        ***@mauritiustelecom.com 20130710
+source:         AFRINIC
+
+
+
+inetnum:        196.223.0.0 - 196.223.0.0
+netname:        MIXP
+descr:          ---------------------------------
+descr:          Mauritius Internet Exchange Point
+descr:          ---------------------------------
+country:        ZW
+admin-c:        RS24-AFRINIC
+admin-c:        GR15-AFRINIC
+tech-c:         MIXP127-AFRINIC
+tech-c:         FOK11-AFRINIC
+org:            ORG-MIXP1-AFRINIC
+status:         ASSIGNED PI
+mnt-by:         AFRINIC-HM-MNT
+mnt-lower:      MIXP-MNT
+mnt-domains:    MIXP-MNT
+mnt-routes:     MIXP-MNT
+notify:         ***@dcl.mu
+notify:         ***@cybernaptics.mu
+notify:         ***@afrinic.net
+notify:         ***@mixp.org
+changed:        ***@afrinic.net 20051210
+changed:        ***@afrinic.net 20110621
+changed:        ***@afrinic.net 20121030
+changed:        ***@afrinic.net 20140721
+changed:        ***@afrinic.net 20140904
+changed:        ***@afrinic.net 20180619
+changed:        ***@afrinic.net 20200406
+source:         AFRINIC
+
+aut-num:        AS36885
+as-name:        Internet2
+descr:          Egyptian MCIT Internet2
+status:         ASSIGNED
+org:            ORG-MoCa1-AFRINIC
+admin-c:        HZEN72
+tech-c:         HZEN72
+mnt-lower:      CAIX-MNT
+mnt-routes:     CAIX-MNT
+mnt-by:         AFRINIC-HM-MNT
+changed:        ***@afrinic.net 20060104
+changed:        ***@afrinic.net 20141015
+source:         AFRINIC
+
+
+inet6num:       2001:4200::/23
+netname:        AFRINIC-V6-NET
+descr:          v6 block for allocation to African organisations
+country:        MU
+org:            ORG-AFNC1-AFRINIC
+admin-c:        TEAM-AFRINIC
+tech-c:         TEAM-AFRINIC
+status:         ALLOCATED UNSPECIFIED
+notify:         ***@afrinic.net
+mnt-by:         AFRINIC-HM-MNT
+mnt-domains:    AFRINIC-IT-MNT
+changed:        ***@afrinic.net 20051021
+changed:        ***@afrinic.net 20180525
+source:         AFRINIC
+
+inet6num:       2001:4200::/32
+netname:        TENET-IPV6-1
+descr:          Provider Local Registry
+descr:          Tertiary Education Network
+country:        ZA
+org:            ORG-UP1-AFRINIC
+admin-c:        ADMN2018-AFRINIC
+tech-c:         TC2018-AFRINIC
+tech-c:         PS28-AFRINIC
+status:         ALLOCATED-BY-RIR
+notify:         ***@tenet.ac.za
+notify:         ***@tenet.ac.za
+notify:         ***@tenet.ac.za
+notify:         ***@tenet.ac.za
+notify:         ***@tenet.ac.za
+notify:         ***@tenet.ac.za
+mnt-by:         AFRINIC-HM-MNT
+mnt-lower:      TNET-MNT01
+mnt-domains:    TNET-MNT01
+changed:        ***@afrinic.net 20051021
+changed:        ***@afrinic.net 20130620
+changed:        ***@afrinic.net 20180605
+changed:        ***@afrinic.net 20181226
+changed:        ***@afrinic.net 20191211
+source:         AFRINIC
+
+
+
+inet6num:       2001:4200:5000::/48
+netname:        UFS-IPV6-1
+descr:          University of the Free State
+descr:          Zastron Street Ext
+descr:          Bloemfontein
+descr:          9300
+country:        ZA
+admin-c:        HJ107-AFRINIC
+tech-c:         HJ107-AFRINIC
+status:         ASSIGNED PA
+mnt-by:         TF-192-96-MNT
+mnt-lower:      TF-192-96-MNT
+notify:         ***@tenet.ac.za
+changed:        ***@tenet.ac.za 20051207
+source:         AFRINIC
+
+
+route:          195.2.0.0/19
+descr:          Cable & Wireless Austria Netblock
+origin:         AS1273
+mnt-by:         CW-EUROPE-GSOC
+created:        1970-01-01T00:00:00Z
+last-modified:  2001-09-22T09:31:39Z
+source:         RIPE
+remarks:        ****************************
+remarks:        * THIS OBJECT IS MODIFIED
+remarks:        * Please note that all data that is generally regarded as personal
+remarks:        * data has been removed from this object.
+remarks:        * To view the original object, please query the RIPE Database at:
+remarks:        * http://www.ripe.net/whois
+remarks:        ****************************

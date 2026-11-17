@@ -1,0 +1,131 @@
+{
+  "handle": "AS64461",
+  "name": "SMARTAVIA-AS",
+  "type": "DIRECT ALLOCATION",
+  "entities": [
+    {
+      "handle": "NRAC2-RIPE",
+      "roles": ["administrative", "technical"],
+      "objectClassName": "entity"
+    },
+    {
+      "handle": "ORG-NRAC1-RIPE",
+      "roles": ["registrant"],
+      "objectClassName": "entity"
+    },
+    {
+      "handle": "RIPE-DB-MNT",
+      "roles": ["registrant"],
+      "objectClassName": "entity"
+    },
+    {
+      "handle": "RIPE-NCC-END-MNT",
+      "roles": ["registrant"],
+      "objectClassName": "entity"
+    },
+    {
+      "handle": "SMARTAVIA-MNT",
+      "roles": ["registrant"],
+      "objectClassName": "entity"
+    },
+    {
+      "handle": "NRAC2-RIPE",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "Smartavia Airlines JSC NOC"],
+          ["kind", {}, "text", "group"],
+          [
+            "adr",
+            {
+              "label": "4 airport Arkhangelsk, Arkhangelsk, Russia"
+            },
+            "text",
+            ["", "", "", "", "", "", ""]
+          ],
+          [
+            "email",
+            {
+              "type": "email"
+            },
+            "text",
+            "noc@flysmartavia.com"
+          ],
+          [
+            "email",
+            {
+              "type": "abuse"
+            },
+            "text",
+            "abuse@flysmartavia.com"
+          ]
+        ]
+      ],
+      "roles": ["abuse"],
+      "entities": [
+        {
+          "handle": "AV10354-RIPE",
+          "roles": ["technical"],
+          "objectClassName": "entity"
+        },
+        {
+          "handle": "DK7877-RIPE",
+          "roles": ["administrative"],
+          "objectClassName": "entity"
+        },
+        {
+          "handle": "RIPE-DB-MNT",
+          "roles": ["registrant"],
+          "objectClassName": "entity"
+        }
+      ],
+      "objectClassName": "entity"
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.db.ripe.net/autnum/64461",
+      "rel": "self",
+      "href": "https://rdap.db.ripe.net/autnum/64461"
+    },
+    {
+      "value": "http://www.ripe.net/data-tools/support/documentation/terms",
+      "rel": "copyright",
+      "href": "http://www.ripe.net/data-tools/support/documentation/terms"
+    }
+  ],
+  "events": [
+    {
+      "eventAction": "last changed",
+      "eventDate": "2021-07-14T12:33:34Z"
+    }
+  ],
+  "rdapConformance": ["rdap_level_0"],
+  "notices": [
+    {
+      "title": "Filtered",
+      "description": ["This output has been filtered."]
+    },
+    {
+      "title": "Source",
+      "description": ["Objects returned came from source", "RIPE"]
+    },
+    {
+      "title": "Terms and Conditions",
+      "description": [
+        "This is the RIPE Database query service. The objects are in RDAP format."
+      ],
+      "links": [
+        {
+          "value": "https://rdap.db.ripe.net/autnum/64461",
+          "rel": "terms-of-service",
+          "href": "http://www.ripe.net/db/support/db-terms-conditions.pdf",
+          "type": "application/pdf"
+        }
+      ]
+    }
+  ],
+  "port43": "whois.ripe.net",
+  "objectClassName": "autnum"
+}

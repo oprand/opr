@@ -1,0 +1,9 @@
+{
+  "rdapConformance": ["rdap_level_0"],
+  "objectClassName": "autnum",
+  "handle": "AS131072 - AS132095",
+  "startAutnum": 131072,
+  "endAutnum": 132095,
+  "name": "CNNIC-AS-BLOCK",
+  "status": ["active"]
+}

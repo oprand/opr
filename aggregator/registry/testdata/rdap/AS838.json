@@ -1,0 +1,53 @@
+{
+  "objectClassName": "autnum",
+  "handle": "AS838",
+  "startAutnum": 838,
+  "endAutnum": 842,
+  "name": "CANET2-ASN",
+  "status": ["active"],
+  "events": [
+    {
+      "eventAction": "last changed",
+      "eventDate": "2003-07-14T15:24:03-04:00"
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.arin.net/registry/autnum/838",
+      "rel": "self",
+      "type": "application/rdap+json",
+      "href": "https://rdap.arin.net/registry/autnum/838"
+    }
+  ],
+  "entities": [
+    {
+      "handle": "CRN-6",
+      "objectClassName": "entity",
+      "roles": ["registrant"],
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "Canadian Research Network"],
+          ["kind", {}, "text", "org"]
+        ]
+      ],
+      "entities": [
+        {
+          "handle": "CA-NOC-ARIN",
+          "objectClassName": "entity",
+          "roles": ["technical", "administrative", "abuse"],
+          "vcardArray": [
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              ["fn", {}, "text", "CA net Network Operation Center"],
+              ["kind", {}, "text", "group"],
+              ["email", {}, "text", "noc@canet.ca"]
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,236 @@
+{
+  "rdapConformance": [
+    "nro_rdap_profile_0",
+    "rdap_level_0",
+    "nro_rdap_profile_asn_flat_0"
+  ],
+  "notices": [
+    {
+      "title": "Terms of Service",
+      "description": [
+        "By using the ARIN RDAP/Whois service, you are agreeing to the RDAP/Whois Terms of Use"
+      ],
+      "links": [
+        {
+          "value": "https://rdap.arin.net/registry/autnum/64255",
+          "rel": "terms-of-service",
+          "type": "text/html",
+          "href": "https://www.arin.net/resources/registry/whois/tou/"
+        }
+      ]
+    },
+    {
+      "title": "Whois Inaccuracy Reporting",
+      "description": ["If you see inaccuracies in the results, please visit: "],
+      "links": [
+        {
+          "value": "https://rdap.arin.net/registry/autnum/64255",
+          "rel": "inaccuracy-report",
+          "type": "text/html",
+          "href": "https://www.arin.net/resources/registry/whois/inaccuracy_reporting/"
+        }
+      ]
+    },
+    {
+      "title": "Copyright Notice",
+      "description": [
+        "Copyright 1997-2022, American Registry for Internet Numbers, Ltd."
+      ]
+    }
+  ],
+  "handle": "AS64255",
+  "startAutnum": 64255,
+  "endAutnum": 64255,
+  "name": "EM-888",
+  "events": [
+    {
+      "eventAction": "last changed",
+      "eventDate": "2022-06-14T14:52:33-04:00"
+    },
+    {
+      "eventAction": "registration",
+      "eventDate": "2016-05-18T12:44:13-04:00"
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.arin.net/registry/autnum/64255",
+      "rel": "self",
+      "type": "application/rdap+json",
+      "href": "https://rdap.arin.net/registry/autnum/64255"
+    },
+    {
+      "value": "https://rdap.arin.net/registry/autnum/64255",
+      "rel": "alternate",
+      "type": "application/xml",
+      "href": "https://whois.arin.net/rest/asn/AS64255"
+    }
+  ],
+  "entities": [
+    {
+      "handle": "IE-217",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "Intercontinental Exchange, Inc."],
+          [
+            "adr",
+            {
+              "label": "5660 New Northside Dr. NW\nAtlanta\nGA\n30328\nUnited States"
+            },
+            "text",
+            ["", "", "", "", "", "", ""]
+          ],
+          ["kind", {}, "text", "org"]
+        ]
+      ],
+      "roles": ["registrant"],
+      "links": [
+        {
+          "value": "https://rdap.arin.net/registry/autnum/64255",
+          "rel": "self",
+          "type": "application/rdap+json",
+          "href": "https://rdap.arin.net/registry/entity/IE-217"
+        },
+        {
+          "value": "https://rdap.arin.net/registry/autnum/64255",
+          "rel": "alternate",
+          "type": "application/xml",
+          "href": "https://whois.arin.net/rest/org/IE-217"
+        }
+      ],
+      "events": [
+        {
+          "eventAction": "last changed",
+          "eventDate": "2019-07-24T15:13:40-04:00"
+        },
+        {
+          "eventAction": "registration",
+          "eventDate": "2016-03-30T10:06:28-04:00"
+        }
+      ],
+      "entities": [
+        {
+          "handle": "ABUSE5412-ARIN",
+          "vcardArray": [
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              [
+                "adr",
+                {
+                  "label": "5660 New Northside Dr. NW\nAtlanta\nGA\n30328\nUnited States"
+                },
+                "text",
+                ["", "", "", "", "", "", ""]
+              ],
+              ["fn", {}, "text", "Abuse"],
+              ["org", {}, "text", "Abuse"],
+              ["kind", {}, "text", "group"],
+              ["email", {}, "text", "abuse@theice.com"],
+              [
+                "tel",
+                {
+                  "type": ["work", "voice"]
+                },
+                "text",
+                "+1-770-857-4700"
+              ]
+            ]
+          ],
+          "roles": ["abuse"],
+          "links": [
+            {
+              "value": "https://rdap.arin.net/registry/autnum/64255",
+              "rel": "self",
+              "type": "application/rdap+json",
+              "href": "https://rdap.arin.net/registry/entity/ABUSE5412-ARIN"
+            },
+            {
+              "value": "https://rdap.arin.net/registry/autnum/64255",
+              "rel": "alternate",
+              "type": "application/xml",
+              "href": "https://whois.arin.net/rest/poc/ABUSE5412-ARIN"
+            }
+          ],
+          "events": [
+            {
+              "eventAction": "last changed",
+              "eventDate": "2021-07-12T10:12:09-04:00"
+            },
+            {
+              "eventAction": "registration",
+              "eventDate": "2016-03-28T15:18:19-04:00"
+            }
+          ],
+          "status": ["validated"],
+          "port43": "whois.arin.net",
+          "objectClassName": "entity"
+        },
+        {
+          "handle": "INT8-ARIN",
+          "vcardArray": [
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              [
+                "adr",
+                {
+                  "label": "5660 New Northside Dr. NW\nAtlanta\nGA\n30328\nUnited States"
+                },
+                "text",
+                ["", "", "", "", "", "", ""]
+              ],
+              ["fn", {}, "text", "ICE Network Team"],
+              ["org", {}, "text", "ICE Network Team"],
+              ["kind", {}, "text", "group"],
+              ["email", {}, "text", "riradmin@theice.com"],
+              [
+                "tel",
+                {
+                  "type": ["work", "voice"]
+                },
+                "text",
+                "+1-770-738-2101"
+              ]
+            ]
+          ],
+          "roles": ["abuse", "administrative", "technical", "noc"],
+          "links": [
+            {
+              "value": "https://rdap.arin.net/registry/autnum/64255",
+              "rel": "self",
+              "type": "application/rdap+json",
+              "href": "https://rdap.arin.net/registry/entity/INT8-ARIN"
+            },
+            {
+              "value": "https://rdap.arin.net/registry/autnum/64255",
+              "rel": "alternate",
+              "type": "application/xml",
+              "href": "https://whois.arin.net/rest/poc/INT8-ARIN"
+            }
+          ],
+          "events": [
+            {
+              "eventAction": "last changed",
+              "eventDate": "2021-09-13T16:47:58-04:00"
+            },
+            {
+              "eventAction": "registration",
+              "eventDate": "2017-09-05T10:27:22-04:00"
+            }
+          ],
+          "status": ["validated"],
+          "port43": "whois.arin.net",
+          "objectClassName": "entity"
+        }
+      ],
+      "port43": "whois.arin.net",
+      "objectClassName": "entity"
+    }
+  ],
+  "port43": "whois.arin.net",
+  "status": ["active"],
+  "objectClassName": "autnum"
+}

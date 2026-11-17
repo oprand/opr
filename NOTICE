@@ -1,0 +1,7 @@
+Copyright 2026 Oprand
+
+This product includes software developed for the opr project.
+
+Third-party software:
+The tree under pkg/openrdap is MIT-licensed. See pkg/openrdap/rdap/LICENSE
+and any sibling LICENSE files under pkg/openrdap.
