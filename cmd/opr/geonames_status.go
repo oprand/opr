@@ -18,7 +18,7 @@ import (
 func geonamesStatusCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "status",
-		Usage: "Print a read-only status board for GeoNames dump tables, lookup match kinds, remap, and dump clocks. No downloads.",
+		Usage: "Print a read-only status board for GeoNames dump tables, lookup match kinds, remap, and dump clocks. No downloads. Needs Postgres.",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:  "json",

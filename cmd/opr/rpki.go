@@ -14,19 +14,14 @@ import (
 
 func rpkiCommand() *cli.Command {
 	return &cli.Command{
-		Name:     "rpki",
-		Category: commandCategoryData,
-		Usage:    "Ingest Routinator jsonext into vrp and aspa. Prefix/ASN pages read Postgres; this command does not stamp BGP prefixes.",
-		Description: `Ingest Routinator jsonext into vrp and aspa. Prefix/ASN pages read Postgres; this command does not stamp BGP prefixes.
-
-Subcommands:
-  ingest  GET /jsonext from --routinator-addr, then --routinator-fallback-addr, COPY-swap vrp and aspa.
-
-Bare "opr rpki" prints this help.`,
+		Name:        "rpki",
+		Category:    commandCategoryData,
+		Usage:       "Ingest Routinator jsonext into vrp and aspa. Does not stamp BGP prefixes. Needs Postgres.",
+		Description: "Pick subcommand ingest. Prefix/ASN pages read the resulting Postgres rows.",
 		Subcommands: []*cli.Command{
 			{
 				Name:  "ingest",
-				Usage: "GET /jsonext from Routinator and COPY-swap vrp and aspa. Empty roas keep the last snapshot.",
+				Usage: "GET /jsonext from Routinator and COPY-swap vrp and aspa. Empty roas keep the last snapshot. In opr run this is the periodic [rpki.ingest] job.",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:  "routinator-addr",

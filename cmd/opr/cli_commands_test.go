@@ -623,6 +623,73 @@ func TestPostgresCommandsRequireDSN(t *testing.T) {
 	}
 }
 
+func TestCLIHelpUsageShowsGlobalOptions(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		args []string
+		want string
+	}{
+		{[]string{"opr", "--help"}, "opr [global options] command [command options]"},
+		{[]string{"opr", "geoip", "--help"}, "opr [global options] geoip [subcommand] [options]"},
+		{[]string{"opr", "geoip", "ipmap", "--help"}, "opr [global options] geoip ipmap [options]"},
+		{[]string{"opr", "fdns", "--help"}, "opr [global options] fdns [subcommand] [options]"},
+		{[]string{"opr", "fdns", "resolve", "--help"}, "opr [global options] fdns resolve [options]"},
+		{[]string{"opr", "registry-crawl", "--help"}, "opr [global options] registry-crawl [subcommand] [options]"},
+		{[]string{"opr", "postgres", "--help"}, "opr [global options] postgres [subcommand] [options]"},
+		{[]string{"opr", "run", "--help"}, "opr [global options] run [options]"},
+	}
+	for _, tc := range cases {
+		app := newCLIApp()
+		var buf strings.Builder
+		app.Writer = &buf
+		app.ErrWriter = io.Discard
+		if err := app.Run(tc.args); err != nil {
+			t.Fatalf("%v: %v", tc.args, err)
+		}
+		out := buf.String()
+		if !strings.Contains(out, tc.want) {
+			t.Errorf("%v USAGE missing %q:\n%s", tc.args, tc.want, out)
+		}
+	}
+
+	helpCmd := findCommand(newCLIApp().Commands, "help")
+	if helpCmd == nil {
+		t.Fatal("help must be registered")
+	}
+	if helpCmd.UsageText != "opr [global options] help [command]" {
+		t.Errorf("help UsageText=%q", helpCmd.UsageText)
+	}
+
+	// Parent Description must not re-list subcommand blurbs already under SUBCOMMANDS.
+	app := newCLIApp()
+	var buf strings.Builder
+	app.Writer = &buf
+	app.ErrWriter = io.Discard
+	if err := app.Run([]string{"opr", "geoip", "--help"}); err != nil {
+		t.Fatal(err)
+	}
+	geoHelp := buf.String()
+	if strings.Contains(geoHelp, "Subcommands:") {
+		t.Fatalf("geoip parent help must not duplicate a Subcommands: list:\n%s", geoHelp)
+	}
+	descAt := strings.Index(geoHelp, "DESCRIPTION:")
+	subsAt := strings.Index(geoHelp, "SUBCOMMANDS:")
+	if descAt < 0 || subsAt < 0 || descAt > subsAt {
+		t.Fatalf("geoip help missing DESCRIPTION/SUBCOMMANDS:\n%s", geoHelp)
+	}
+	desc := geoHelp[descAt:subsAt]
+	for _, phrase := range []string{
+		"One HTTP GET per unique catalog URL",
+		"Deletes geoip rows whose source_url",
+		"bgptools anycatch v4/v6",
+	} {
+		if strings.Contains(desc, phrase) {
+			t.Errorf("geoip DESCRIPTION repeats subcommand Usage %q", phrase)
+		}
+	}
+}
+
 func TestCLIHelpGroupsManagementCommands(t *testing.T) {
 	t.Parallel()
 
@@ -834,7 +901,7 @@ func TestCLIRegistersRegistryCrawlSurface(t *testing.T) {
 		t.Fatal("registry-crawl bulk must be registered")
 	}
 	if !flagNameSet(bulk.Flags)["with-whoisdb-route-fetch"] {
-		t.Error("bulk must keep --with-whoisdb-route-fetch (IRR route objects, toml whoisdb.with-route-objects)")
+		t.Error("bulk must keep --with-whoisdb-route-fetch (IRR route objects, toml registry-crawl.bulk.with-route-objects)")
 	}
 }
 
@@ -977,7 +1044,7 @@ func TestRunRequiresOPRDSNBeforeConnecting(t *testing.T) {
 	}
 
 	// Unknown keys too.
-	unknownPath := writeTempConfig(t, "[rdap]\nbogus = 1\n")
+	unknownPath := writeTempConfig(t, "[registry-crawl.worker]\nbogus = 1\n")
 	err = app.Run([]string{"opr", "run", "--config", unknownPath})
 	if err == nil || !strings.Contains(err.Error(), "unknown key") {
 		t.Fatalf("run with unknown key err=%v, want unknown key", err)

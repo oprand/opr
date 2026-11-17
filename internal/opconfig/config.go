@@ -10,6 +10,9 @@
 // `enabled`, which defaults to true, so a short file still runs the full
 // daemon. Unknown keys are errors. Durations are TOML strings parsed with
 // time.ParseDuration ("24h", "2m", "1h30m").
+//
+// Job section names match CLI syntax: [command] or [command.subcommand]
+// (e.g. [registry-crawl.worker], [geoip.lacnic], [rpki.ingest]).
 package opconfig
 
 import (
@@ -110,22 +113,28 @@ func (d Duration) String() string { return time.Duration(d).String() }
 
 // Config is the whole opr.config.toml.
 type Config struct {
-	RDAP       RDAP       `toml:"rdap"`
-	Seed       Seed       `toml:"seed"`
-	WhoisDB    WhoisDB    `toml:"whoisdb"`
-	GeoNames   GeoNames   `toml:"geonames"`
-	PeeringDB  PeeringDB  `toml:"peeringdb"`
-	ASPop      ASPop      `toml:"aspop"`
-	GeoIP      GeoIP      `toml:"geoip"`
-	RPKI       RPKI       `toml:"rpki"`
-	FDNS       FDNS       `toml:"fdns"`
-	RDNS       RDNS       `toml:"rdns"`
-	ClickHouse ClickHouse `toml:"clickhouse"`
+	RegistryCrawl RegistryCrawl `toml:"registry-crawl"`
+	GeoNames      GeoNames      `toml:"geonames"`
+	PeeringDB     PeeringDB     `toml:"peeringdb"`
+	ASPop         ASPop         `toml:"aspop"`
+	GeoIP         GeoIP         `toml:"geoip"`
+	RPKI          RPKI          `toml:"rpki"`
+	FDNS          FDNS          `toml:"fdns"`
+	RDNS          RDNS          `toml:"rdns"`
+	ClickHouse    ClickHouse    `toml:"clickhouse"`
 }
 
-// RDAP is [rdap]: the durable crawl_target queue workers. `enabled` starts
-// autnum workers; `ipnet` starts ipnet workers in the same process.
-type RDAP struct {
+// RegistryCrawl groups the [registry-crawl.*] tables.
+type RegistryCrawl struct {
+	Worker RegistryCrawlWorker `toml:"worker"`
+	Seed   RegistryCrawlSeed   `toml:"seed"`
+	Bulk   RegistryCrawlBulk   `toml:"bulk"`
+}
+
+// RegistryCrawlWorker is [registry-crawl.worker]: the durable crawl_target
+// queue workers. `enabled` starts autnum workers; `ipnet` starts ipnet
+// workers in the same process.
+type RegistryCrawlWorker struct {
 	Enabled         bool     `toml:"enabled"`
 	Ipnet           bool     `toml:"ipnet"`
 	OnlyRegistries  []string `toml:"only-registries"`
@@ -135,9 +144,10 @@ type RDAP struct {
 	Proxies         []string `toml:"proxies"`
 }
 
-// Seed is [seed]: NRO delegated-stats refresh plus crawl_target enqueue
-// (autnum, ipnet, RouteViews RIBs), same as `registry-crawl seed`.
-type Seed struct {
+// RegistryCrawlSeed is [registry-crawl.seed]: NRO delegated-stats refresh
+// plus crawl_target enqueue (autnum, ipnet, RouteViews RIBs), same as
+// `registry-crawl seed`.
+type RegistryCrawlSeed struct {
 	Enabled           bool     `toml:"enabled"`
 	Interval          Duration `toml:"interval"`
 	SkipRIBs          bool     `toml:"skip-ribs"`
@@ -146,8 +156,9 @@ type Seed struct {
 	OnlyRegistries []string `toml:"only-registries"`
 }
 
-// WhoisDB is [whoisdb]: bulk whois dumps, same as `registry-crawl bulk`.
-type WhoisDB struct {
+// RegistryCrawlBulk is [registry-crawl.bulk]: bulk whois dumps, same as
+// `registry-crawl bulk`.
+type RegistryCrawlBulk struct {
 	Enabled          bool     `toml:"enabled"`
 	Period           Duration `toml:"period"`
 	BufferMaxSize    int      `toml:"buffer-max-size"`
@@ -175,23 +186,51 @@ type ASPop struct {
 	Interval Duration `toml:"interval"`
 }
 
-// GeoIP is [geoip]: lacnic, ipmap, anycast on their own intervals, plus the
-// continuous geofeeds crawl.
+// GeoIP groups the [geoip.*] tables.
 type GeoIP struct {
-	Enabled                 bool     `toml:"enabled"`
-	LacnicInterval          Duration `toml:"lacnic-interval"`
-	IPMapInterval           Duration `toml:"ipmap-interval"`
-	AnycastInterval         Duration `toml:"anycast-interval"`
-	GeofeedRefreshOlderThan Duration `toml:"geofeed-refresh-older-than"`
-	WorkerCount             int      `toml:"worker-count"`
-	// IPMapForce and AnycastForce ignore the stored ETag. Default false,
-	// so a normal daemon run still skips an unchanged dump.
-	IPMapForce   bool `toml:"ipmap-force"`
-	AnycastForce bool `toml:"anycast-force"`
+	Lacnic        GeoIPLacnic        `toml:"lacnic"`
+	IPMap         GeoIPIPMap         `toml:"ipmap"`
+	Anycast       GeoIPAnycast       `toml:"anycast"`
+	CrawlGeofeeds GeoIPCrawlGeofeeds `toml:"crawl-geofeeds"`
 }
 
-// RPKI is [rpki].
+// GeoIPLacnic is [geoip.lacnic]: the LACNIC inetnum CSV on interval.
+type GeoIPLacnic struct {
+	Enabled  bool     `toml:"enabled"`
+	Interval Duration `toml:"interval"`
+}
+
+// GeoIPIPMap is [geoip.ipmap]: the RIPE IPmap dump on interval.
+type GeoIPIPMap struct {
+	Enabled  bool     `toml:"enabled"`
+	Interval Duration `toml:"interval"`
+	// Force ignores the stored ETag. Default false, so a normal daemon run
+	// still skips an unchanged dump.
+	Force bool `toml:"force"`
+}
+
+// GeoIPAnycast is [geoip.anycast]: bgptools anycatch CSVs on interval.
+type GeoIPAnycast struct {
+	Enabled  bool     `toml:"enabled"`
+	Interval Duration `toml:"interval"`
+	// Force ignores the stored ETag. Default false.
+	Force bool `toml:"force"`
+}
+
+// GeoIPCrawlGeofeeds is [geoip.crawl-geofeeds]: the continuous geofeeds crawl.
+type GeoIPCrawlGeofeeds struct {
+	Enabled                 bool     `toml:"enabled"`
+	GeofeedRefreshOlderThan Duration `toml:"geofeed-refresh-older-than"`
+	WorkerCount             int      `toml:"worker-count"`
+}
+
+// RPKI groups the [rpki.*] tables.
 type RPKI struct {
+	Ingest RPKIIngest `toml:"ingest"`
+}
+
+// RPKIIngest is [rpki.ingest].
+type RPKIIngest struct {
 	Enabled                bool     `toml:"enabled"`
 	Interval               Duration `toml:"interval"`
 	RoutinatorAddr         string   `toml:"routinator-addr"`
@@ -298,27 +337,29 @@ type ClickHouse struct {
 // enabled, every setting at its one-shot flag default.
 func Default() *Config {
 	return &Config{
-		RDAP: RDAP{
-			Enabled:        true,
-			Ipnet:          true,
-			OnlyRegistries: []string{},
-			Lease:          Duration(DefaultRDAPLease),
-			Batch:          DefaultRDAPBatch,
-			Proxies:        []string{},
-		},
-		Seed: Seed{
-			Enabled:           true,
-			Interval:          Duration(DefaultSeedInterval),
-			DelegatedStatsURL: nro.DefaultDelegatedStatsURL,
-			OnlyRegistries:    []string{},
-		},
-		WhoisDB: WhoisDB{
-			Enabled:          true,
-			Period:           Duration(DefaultWhoisDBPeriod),
-			BufferMaxSize:    DefaultWhoisDBBufferMaxSize,
-			WithRouteObjects: true,
-			Prefetch:         whoisdb.DefaultPrefetchDepth,
-			AsnamesURL:       asnames.DefaultURL,
+		RegistryCrawl: RegistryCrawl{
+			Worker: RegistryCrawlWorker{
+				Enabled:        true,
+				Ipnet:          true,
+				OnlyRegistries: []string{},
+				Lease:          Duration(DefaultRDAPLease),
+				Batch:          DefaultRDAPBatch,
+				Proxies:        []string{},
+			},
+			Seed: RegistryCrawlSeed{
+				Enabled:           true,
+				Interval:          Duration(DefaultSeedInterval),
+				DelegatedStatsURL: nro.DefaultDelegatedStatsURL,
+				OnlyRegistries:    []string{},
+			},
+			Bulk: RegistryCrawlBulk{
+				Enabled:          true,
+				Period:           Duration(DefaultWhoisDBPeriod),
+				BufferMaxSize:    DefaultWhoisDBBufferMaxSize,
+				WithRouteObjects: true,
+				Prefetch:         whoisdb.DefaultPrefetchDepth,
+				AsnamesURL:       asnames.DefaultURL,
+			},
 		},
 		GeoNames: GeoNames{
 			Enabled:  true,
@@ -333,17 +374,30 @@ func Default() *Config {
 			Interval: Duration(DefaultASPopInterval),
 		},
 		GeoIP: GeoIP{
-			Enabled:                 true,
-			LacnicInterval:          Duration(DefaultGeoIPLacnicInterval),
-			IPMapInterval:           Duration(DefaultGeoIPIPMapInterval),
-			AnycastInterval:         Duration(DefaultGeoIPAnycastInterval),
-			GeofeedRefreshOlderThan: Duration(geofeeds.DefaultRefreshOlderThan),
-			WorkerCount:             geofeeds.DefaultWorkerCount,
+			Lacnic: GeoIPLacnic{
+				Enabled:  true,
+				Interval: Duration(DefaultGeoIPLacnicInterval),
+			},
+			IPMap: GeoIPIPMap{
+				Enabled:  true,
+				Interval: Duration(DefaultGeoIPIPMapInterval),
+			},
+			Anycast: GeoIPAnycast{
+				Enabled:  true,
+				Interval: Duration(DefaultGeoIPAnycastInterval),
+			},
+			CrawlGeofeeds: GeoIPCrawlGeofeeds{
+				Enabled:                 true,
+				GeofeedRefreshOlderThan: Duration(geofeeds.DefaultRefreshOlderThan),
+				WorkerCount:             geofeeds.DefaultWorkerCount,
+			},
 		},
 		RPKI: RPKI{
-			Enabled:        true,
-			Interval:       Duration(DefaultRPKIInterval),
-			RoutinatorAddr: rpki.DefaultRoutinatorAddr,
+			Ingest: RPKIIngest{
+				Enabled:        true,
+				Interval:       Duration(DefaultRPKIInterval),
+				RoutinatorAddr: rpki.DefaultRoutinatorAddr,
+			},
 		},
 		FDNS: FDNS{
 			IngestLists: FDNSIngestLists{
@@ -548,43 +602,51 @@ func (c *Config) Validate() error {
 		return out
 	}
 
-	positive("rdap.lease", c.RDAP.Lease)
-	if c.RDAP.Batch < 1 {
-		add("rdap.batch must be >= 1, got %d", c.RDAP.Batch)
+	wc := &c.RegistryCrawl.Worker
+	positive("registry-crawl.worker.lease", wc.Lease)
+	if wc.Batch < 1 {
+		add("registry-crawl.worker.batch must be >= 1, got %d", wc.Batch)
 	}
-	c.RDAP.OnlyRegistries = normalizeRegistries("rdap.only-registries", c.RDAP.OnlyRegistries)
-	for i, raw := range c.RDAP.Proxies {
+	wc.OnlyRegistries = normalizeRegistries("registry-crawl.worker.only-registries", wc.OnlyRegistries)
+	for i, raw := range wc.Proxies {
 		trimmed := strings.TrimSpace(raw)
-		c.RDAP.Proxies[i] = trimmed
+		wc.Proxies[i] = trimmed
 		// Keep userinfo. The parse error from net/url includes the raw input,
 		// which may be a password, so the message only names the index.
 		if _, err := url.Parse(trimmed); err != nil {
-			add("rdap.proxies: invalid proxy URL at index %d", i)
+			add("registry-crawl.worker.proxies: invalid proxy URL at index %d", i)
 		}
 	}
 
-	positive("seed.interval", c.Seed.Interval)
-	c.Seed.OnlyRegistries = normalizeRegistries("seed.only-registries", c.Seed.OnlyRegistries)
-	positive("whoisdb.period", c.WhoisDB.Period)
-	if c.WhoisDB.BufferMaxSize < 1 {
-		add("whoisdb.buffer-max-size must be >= 1, got %d", c.WhoisDB.BufferMaxSize)
+	sc := &c.RegistryCrawl.Seed
+	positive("registry-crawl.seed.interval", sc.Interval)
+	sc.OnlyRegistries = normalizeRegistries("registry-crawl.seed.only-registries", sc.OnlyRegistries)
+
+	bc := &c.RegistryCrawl.Bulk
+	positive("registry-crawl.bulk.period", bc.Period)
+	if bc.BufferMaxSize < 1 {
+		add("registry-crawl.bulk.buffer-max-size must be >= 1, got %d", bc.BufferMaxSize)
 	}
-	if c.WhoisDB.Prefetch < 1 {
-		add("whoisdb.prefetch must be >= 1, got %d", c.WhoisDB.Prefetch)
+	if bc.Prefetch < 1 {
+		add("registry-crawl.bulk.prefetch must be >= 1, got %d", bc.Prefetch)
 	}
+
 	positive("geonames.interval", c.GeoNames.Interval)
 	positive("peeringdb.interval", c.PeeringDB.Interval)
 	positive("aspop.interval", c.ASPop.Interval)
-	positive("geoip.lacnic-interval", c.GeoIP.LacnicInterval)
-	positive("geoip.ipmap-interval", c.GeoIP.IPMapInterval)
-	positive("geoip.anycast-interval", c.GeoIP.AnycastInterval)
-	positive("geoip.geofeed-refresh-older-than", c.GeoIP.GeofeedRefreshOlderThan)
-	if c.GeoIP.WorkerCount < 1 {
-		add("geoip.worker-count must be >= 1, got %d", c.GeoIP.WorkerCount)
+
+	positive("geoip.lacnic.interval", c.GeoIP.Lacnic.Interval)
+	positive("geoip.ipmap.interval", c.GeoIP.IPMap.Interval)
+	positive("geoip.anycast.interval", c.GeoIP.Anycast.Interval)
+	positive("geoip.crawl-geofeeds.geofeed-refresh-older-than", c.GeoIP.CrawlGeofeeds.GeofeedRefreshOlderThan)
+	if c.GeoIP.CrawlGeofeeds.WorkerCount < 1 {
+		add("geoip.crawl-geofeeds.worker-count must be >= 1, got %d", c.GeoIP.CrawlGeofeeds.WorkerCount)
 	}
-	positive("rpki.interval", c.RPKI.Interval)
-	if strings.TrimSpace(c.RPKI.RoutinatorAddr) == "" {
-		add("rpki.routinator-addr must not be empty")
+
+	ri := &c.RPKI.Ingest
+	positive("rpki.ingest.interval", ri.Interval)
+	if strings.TrimSpace(ri.RoutinatorAddr) == "" {
+		add("rpki.ingest.routinator-addr must not be empty")
 	}
 
 	positive("fdns.ingest-lists.interval", c.FDNS.IngestLists.Interval)
@@ -653,9 +715,12 @@ func RejectClickHouseURLUserinfo(raw, label string) error {
 
 // AnyEnabled reports whether at least one job would start.
 func (c *Config) AnyEnabled() bool {
-	return c.RDAP.Enabled || c.RDAP.Ipnet || c.Seed.Enabled || c.WhoisDB.Enabled ||
-		c.GeoNames.Enabled || c.PeeringDB.Enabled || c.ASPop.Enabled || c.GeoIP.Enabled ||
-		c.RPKI.Enabled || c.FDNS.IngestLists.Enabled || c.FDNS.Resolve.Enabled ||
-		c.FDNS.IngestCC.Enabled || c.FDNS.SeedQueue.Enabled || c.RDNS.Ingest.Enabled ||
-		c.RDNS.CrawlPTR.Enabled
+	return c.RegistryCrawl.Worker.Enabled || c.RegistryCrawl.Worker.Ipnet ||
+		c.RegistryCrawl.Seed.Enabled || c.RegistryCrawl.Bulk.Enabled ||
+		c.GeoNames.Enabled || c.PeeringDB.Enabled || c.ASPop.Enabled ||
+		c.GeoIP.Lacnic.Enabled || c.GeoIP.IPMap.Enabled || c.GeoIP.Anycast.Enabled ||
+		c.GeoIP.CrawlGeofeeds.Enabled || c.RPKI.Ingest.Enabled ||
+		c.FDNS.IngestLists.Enabled || c.FDNS.Resolve.Enabled ||
+		c.FDNS.IngestCC.Enabled || c.FDNS.SeedQueue.Enabled ||
+		c.RDNS.Ingest.Enabled || c.RDNS.CrawlPTR.Enabled
 }

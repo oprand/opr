@@ -23,14 +23,17 @@ func TestParseEmptyFileIsDefaults(t *testing.T) {
 		t.Fatal(err)
 	}
 	want := Default()
-	if cfg.RDAP.Lease.Std() != DefaultRDAPLease || cfg.RDAP.Batch != DefaultRDAPBatch {
-		t.Errorf("rdap defaults: %+v", cfg.RDAP)
+	wc := cfg.RegistryCrawl.Worker
+	if wc.Lease.Std() != DefaultRDAPLease || wc.Batch != DefaultRDAPBatch {
+		t.Errorf("registry-crawl.worker defaults: %+v", wc)
 	}
-	if cfg.Seed.Interval.Std() != 24*time.Hour || cfg.Seed.DelegatedStatsURL != nro.DefaultDelegatedStatsURL || cfg.Seed.SkipRIBs || len(cfg.Seed.OnlyRegistries) != 0 {
-		t.Errorf("seed defaults: %+v", cfg.Seed)
+	sc := cfg.RegistryCrawl.Seed
+	if sc.Interval.Std() != 24*time.Hour || sc.DelegatedStatsURL != nro.DefaultDelegatedStatsURL || sc.SkipRIBs || len(sc.OnlyRegistries) != 0 {
+		t.Errorf("registry-crawl.seed defaults: %+v", sc)
 	}
-	if cfg.WhoisDB.Period.Std() != time.Hour || cfg.WhoisDB.BufferMaxSize != 5000 || !cfg.WhoisDB.WithRouteObjects || cfg.WhoisDB.Prefetch != whoisdb.DefaultPrefetchDepth {
-		t.Errorf("whoisdb defaults: %+v", cfg.WhoisDB)
+	bc := cfg.RegistryCrawl.Bulk
+	if bc.Period.Std() != time.Hour || bc.BufferMaxSize != 5000 || !bc.WithRouteObjects || bc.Prefetch != whoisdb.DefaultPrefetchDepth {
+		t.Errorf("registry-crawl.bulk defaults: %+v", bc)
 	}
 	if cfg.PeeringDB.Interval.Std() != peeringdb.DefaultCrawlInterval || cfg.PeeringDB.Force {
 		t.Errorf("peeringdb defaults: %+v", cfg.PeeringDB)
@@ -38,11 +41,13 @@ func TestParseEmptyFileIsDefaults(t *testing.T) {
 	if cfg.ASPop.Interval.Std() != 6*time.Hour {
 		t.Errorf("aspop defaults: %+v", cfg.ASPop)
 	}
-	if cfg.GeoIP.WorkerCount != geofeeds.DefaultWorkerCount || cfg.GeoIP.GeofeedRefreshOlderThan.Std() != geofeeds.DefaultRefreshOlderThan || cfg.GeoIP.IPMapForce || cfg.GeoIP.AnycastForce {
+	if cfg.GeoIP.CrawlGeofeeds.WorkerCount != geofeeds.DefaultWorkerCount ||
+		cfg.GeoIP.CrawlGeofeeds.GeofeedRefreshOlderThan.Std() != geofeeds.DefaultRefreshOlderThan ||
+		cfg.GeoIP.IPMap.Force || cfg.GeoIP.Anycast.Force {
 		t.Errorf("geoip defaults: %+v", cfg.GeoIP)
 	}
-	if cfg.RPKI.Interval.Std() != time.Hour || cfg.RPKI.RoutinatorAddr != rpki.DefaultRoutinatorAddr || cfg.RPKI.RoutinatorFallbackAddr != "" {
-		t.Errorf("rpki defaults: %+v", cfg.RPKI)
+	if cfg.RPKI.Ingest.Interval.Std() != time.Hour || cfg.RPKI.Ingest.RoutinatorAddr != rpki.DefaultRoutinatorAddr || cfg.RPKI.Ingest.RoutinatorFallbackAddr != "" {
+		t.Errorf("rpki.ingest defaults: %+v", cfg.RPKI.Ingest)
 	}
 	if len(cfg.FDNS.Resolve.Resolver) != len(fdns.DefaultResolverAddrs) || cfg.FDNS.Resolve.QPS != fdns.DefaultResolveQPS || cfg.FDNS.Resolve.AF != "both" {
 		t.Errorf("fdns.resolve defaults: %+v", cfg.FDNS.Resolve)
@@ -67,7 +72,7 @@ func TestParseEmptyFileIsDefaults(t *testing.T) {
 func TestEnabledDefaultsTrue(t *testing.T) {
 	t.Parallel()
 	cfg, err := Parse([]byte(`
-[rdap]
+[registry-crawl.worker]
 lease = "5m"
 
 [fdns.resolve]
@@ -77,28 +82,31 @@ qps = 10.0
 		t.Fatal(err)
 	}
 	for name, enabled := range map[string]bool{
-		"rdap":              cfg.RDAP.Enabled,
-		"rdap.ipnet":        cfg.RDAP.Ipnet,
-		"seed":              cfg.Seed.Enabled,
-		"whoisdb":           cfg.WhoisDB.Enabled,
-		"geonames":          cfg.GeoNames.Enabled,
-		"peeringdb":         cfg.PeeringDB.Enabled,
-		"aspop":             cfg.ASPop.Enabled,
-		"geoip":             cfg.GeoIP.Enabled,
-		"rpki":              cfg.RPKI.Enabled,
-		"fdns.ingest-lists": cfg.FDNS.IngestLists.Enabled,
-		"fdns.resolve":      cfg.FDNS.Resolve.Enabled,
-		"fdns.ingest-cc":    cfg.FDNS.IngestCC.Enabled,
-		"fdns.seed-queue":   cfg.FDNS.SeedQueue.Enabled,
-		"rdns.ingest":       cfg.RDNS.Ingest.Enabled,
-		"rdns.crawl-ptr":    cfg.RDNS.CrawlPTR.Enabled,
+		"registry-crawl.worker":       cfg.RegistryCrawl.Worker.Enabled,
+		"registry-crawl.worker.ipnet": cfg.RegistryCrawl.Worker.Ipnet,
+		"registry-crawl.seed":         cfg.RegistryCrawl.Seed.Enabled,
+		"registry-crawl.bulk":         cfg.RegistryCrawl.Bulk.Enabled,
+		"geonames":                    cfg.GeoNames.Enabled,
+		"peeringdb":                   cfg.PeeringDB.Enabled,
+		"aspop":                       cfg.ASPop.Enabled,
+		"geoip.lacnic":                cfg.GeoIP.Lacnic.Enabled,
+		"geoip.ipmap":                 cfg.GeoIP.IPMap.Enabled,
+		"geoip.anycast":               cfg.GeoIP.Anycast.Enabled,
+		"geoip.crawl-geofeeds":        cfg.GeoIP.CrawlGeofeeds.Enabled,
+		"rpki.ingest":                 cfg.RPKI.Ingest.Enabled,
+		"fdns.ingest-lists":           cfg.FDNS.IngestLists.Enabled,
+		"fdns.resolve":                cfg.FDNS.Resolve.Enabled,
+		"fdns.ingest-cc":              cfg.FDNS.IngestCC.Enabled,
+		"fdns.seed-queue":             cfg.FDNS.SeedQueue.Enabled,
+		"rdns.ingest":                 cfg.RDNS.Ingest.Enabled,
+		"rdns.crawl-ptr":              cfg.RDNS.CrawlPTR.Enabled,
 	} {
 		if !enabled {
 			t.Errorf("%s.enabled must default to true", name)
 		}
 	}
-	if cfg.RDAP.Lease.Std() != 5*time.Minute || cfg.FDNS.Resolve.QPS != 10 {
-		t.Errorf("explicit keys not applied: %+v %+v", cfg.RDAP, cfg.FDNS.Resolve)
+	if cfg.RegistryCrawl.Worker.Lease.Std() != 5*time.Minute || cfg.FDNS.Resolve.QPS != 10 {
+		t.Errorf("explicit keys not applied: %+v %+v", cfg.RegistryCrawl.Worker, cfg.FDNS.Resolve)
 	}
 	if !cfg.AnyEnabled() {
 		t.Error("AnyEnabled must be true for defaults")
@@ -108,7 +116,7 @@ qps = 10.0
 func TestEnabledFalse(t *testing.T) {
 	t.Parallel()
 	cfg, err := Parse([]byte(`
-[rdap]
+[registry-crawl.worker]
 enabled = false
 ipnet = false
 
@@ -121,18 +129,73 @@ enabled = false
 	if err != nil {
 		t.Fatal(err)
 	}
-	if cfg.RDAP.Enabled || cfg.RDAP.Ipnet || cfg.FDNS.IngestCC.Enabled || cfg.RDNS.CrawlPTR.Enabled {
-		t.Errorf("enabled=false not applied: %+v %+v %+v", cfg.RDAP, cfg.FDNS.IngestCC, cfg.RDNS.CrawlPTR)
+	if cfg.RegistryCrawl.Worker.Enabled || cfg.RegistryCrawl.Worker.Ipnet || cfg.FDNS.IngestCC.Enabled || cfg.RDNS.CrawlPTR.Enabled {
+		t.Errorf("enabled=false not applied: %+v %+v %+v", cfg.RegistryCrawl.Worker, cfg.FDNS.IngestCC, cfg.RDNS.CrawlPTR)
 	}
-	if !cfg.Seed.Enabled || !cfg.FDNS.Resolve.Enabled {
+	if !cfg.RegistryCrawl.Seed.Enabled || !cfg.FDNS.Resolve.Enabled {
 		t.Error("other jobs must stay enabled")
+	}
+}
+
+func TestGeoIPEnabledIndependence(t *testing.T) {
+	t.Parallel()
+	cfg, err := Parse([]byte(`
+[geoip.lacnic]
+enabled = false
+
+[geoip.ipmap]
+enabled = true
+
+[geoip.anycast]
+enabled = false
+
+[geoip.crawl-geofeeds]
+enabled = true
+`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.GeoIP.Lacnic.Enabled {
+		t.Error("geoip.lacnic must be disabled")
+	}
+	if !cfg.GeoIP.IPMap.Enabled {
+		t.Error("geoip.ipmap must stay enabled")
+	}
+	if cfg.GeoIP.Anycast.Enabled {
+		t.Error("geoip.anycast must be disabled")
+	}
+	if !cfg.GeoIP.CrawlGeofeeds.Enabled {
+		t.Error("geoip.crawl-geofeeds must stay enabled")
+	}
+	if !cfg.AnyEnabled() {
+		t.Error("AnyEnabled must be true when some geoip jobs remain on")
+	}
+}
+
+func TestOldSectionNamesAreErrors(t *testing.T) {
+	t.Parallel()
+	for _, src := range []string{
+		"[rdap]\nenabled = true\n",
+		"[seed]\nenabled = true\n",
+		"[whoisdb]\nenabled = true\n",
+		"[geoip]\nenabled = true\n",
+		"[geoip]\nlacnic-interval = \"24h\"\n",
+		"[rpki]\nenabled = true\n",
+		"[registry-crawl.worker]\nlacnic-interval = \"24h\"\n",
+		"[geoip.lacnic]\nlacnic-interval = \"24h\"\n",
+	} {
+		if _, err := Parse([]byte(src)); err == nil {
+			t.Errorf("old section/key accepted:\n%s", src)
+		} else if !strings.Contains(err.Error(), "unknown key") {
+			t.Errorf("old section/key error should say unknown key: %v\n%s", err, src)
+		}
 	}
 }
 
 func TestUnknownKeyIsError(t *testing.T) {
 	t.Parallel()
 	for _, src := range []string{
-		"[rdap]\nenabled = true\nbogus = 1\n",
+		"[registry-crawl.worker]\nenabled = true\nbogus = 1\n",
 		"[nosuch]\nenabled = true\n",
 		"[fdns.resolve]\nresolvers = [\"1.1.1.1\"]\n",
 		"[fdns.nosuch]\nenabled = true\n",
@@ -153,8 +216,8 @@ func TestSecretKeysAreErrors(t *testing.T) {
 		"[clickhouse]\nclickhouse-password = \"x\"\n":     EnvClickHousePassword,
 		"[peeringdb]\napikey = \"x\"\n":                   EnvPeeringDBAPIKey,
 		"[fdns.ingest-cc]\npassword = \"x\"\n":            EnvClickHousePassword,
-		"[rdap]\nenabled = true\n[seed]\ndsn = \"x\"\n":   EnvDSN,
-		"[whoisdb]\nPassword = \"x\"\n":                   EnvClickHousePassword,
+		"[registry-crawl.worker]\nenabled = true\n[registry-crawl.seed]\ndsn = \"x\"\n": EnvDSN,
+		"[registry-crawl.bulk]\nPassword = \"x\"\n":       EnvClickHousePassword,
 		"[[proxies]]\napikey = \"x\"\n":                   EnvPeeringDBAPIKey,
 		"[clickhouse]\nnested = { password = \"x\" }\n":   EnvClickHousePassword,
 		"[fdns]\n[fdns.resolve]\ndsn = \"postgresql://\"": EnvDSN,
@@ -175,14 +238,17 @@ func TestSecretKeysAreErrors(t *testing.T) {
 func TestDurationsParse(t *testing.T) {
 	t.Parallel()
 	cfg, err := Parse([]byte(`
-[seed]
+[registry-crawl.seed]
 interval = "36h"
 
-[whoisdb]
+[registry-crawl.bulk]
 period = "90m"
 
-[rdap]
+[registry-crawl.worker]
 lease = "1h30m"
+
+[geoip.lacnic]
+interval = "12h"
 
 [rdns.crawl-ptr]
 timeout = "1500ms"
@@ -193,14 +259,17 @@ timeout = "45s"
 	if err != nil {
 		t.Fatal(err)
 	}
-	if cfg.Seed.Interval.Std() != 36*time.Hour {
-		t.Errorf("seed.interval=%s", cfg.Seed.Interval)
+	if cfg.RegistryCrawl.Seed.Interval.Std() != 36*time.Hour {
+		t.Errorf("registry-crawl.seed.interval=%s", cfg.RegistryCrawl.Seed.Interval)
 	}
-	if cfg.WhoisDB.Period.Std() != 90*time.Minute {
-		t.Errorf("whoisdb.period=%s", cfg.WhoisDB.Period)
+	if cfg.RegistryCrawl.Bulk.Period.Std() != 90*time.Minute {
+		t.Errorf("registry-crawl.bulk.period=%s", cfg.RegistryCrawl.Bulk.Period)
 	}
-	if cfg.RDAP.Lease.Std() != 90*time.Minute {
-		t.Errorf("rdap.lease=%s", cfg.RDAP.Lease)
+	if cfg.RegistryCrawl.Worker.Lease.Std() != 90*time.Minute {
+		t.Errorf("registry-crawl.worker.lease=%s", cfg.RegistryCrawl.Worker.Lease)
+	}
+	if cfg.GeoIP.Lacnic.Interval.Std() != 12*time.Hour {
+		t.Errorf("geoip.lacnic.interval=%s", cfg.GeoIP.Lacnic.Interval)
 	}
 	if cfg.RDNS.CrawlPTR.Timeout.Std() != 1500*time.Millisecond {
 		t.Errorf("rdns.crawl-ptr.timeout=%s", cfg.RDNS.CrawlPTR.Timeout)
@@ -209,9 +278,9 @@ timeout = "45s"
 		t.Errorf("clickhouse.timeout=%s", cfg.ClickHouse.Timeout)
 	}
 	for _, bad := range []string{
-		"[seed]\ninterval = \"tomorrow\"\n",
-		"[seed]\ninterval = \"0s\"\n",
-		"[seed]\ninterval = \"-1h\"\n",
+		"[registry-crawl.seed]\ninterval = \"tomorrow\"\n",
+		"[registry-crawl.seed]\ninterval = \"0s\"\n",
+		"[registry-crawl.seed]\ninterval = \"-1h\"\n",
 	} {
 		if _, err := Parse([]byte(bad)); err == nil {
 			t.Errorf("bad duration accepted:\n%s", bad)
@@ -225,7 +294,7 @@ func TestSlicesReplaceDefaults(t *testing.T) {
 [fdns.resolve]
 resolver = ["127.0.0.1:5353"]
 
-[rdap]
+[registry-crawl.worker]
 only-registries = ["ARIN"]
 proxies = []
 `))
@@ -235,25 +304,25 @@ proxies = []
 	if len(cfg.FDNS.Resolve.Resolver) != 1 || cfg.FDNS.Resolve.Resolver[0] != "127.0.0.1:5353" {
 		t.Errorf("resolver must replace the defaults, got %v", cfg.FDNS.Resolve.Resolver)
 	}
-	if len(cfg.RDAP.OnlyRegistries) != 1 || cfg.RDAP.OnlyRegistries[0] != "ARIN" {
-		t.Errorf("only-registries=%v", cfg.RDAP.OnlyRegistries)
+	if len(cfg.RegistryCrawl.Worker.OnlyRegistries) != 1 || cfg.RegistryCrawl.Worker.OnlyRegistries[0] != "ARIN" {
+		t.Errorf("only-registries=%v", cfg.RegistryCrawl.Worker.OnlyRegistries)
 	}
-	if len(cfg.RDAP.Proxies) != 0 {
-		t.Errorf("proxies=%v", cfg.RDAP.Proxies)
+	if len(cfg.RegistryCrawl.Worker.Proxies) != 0 {
+		t.Errorf("proxies=%v", cfg.RegistryCrawl.Worker.Proxies)
 	}
 }
 
 func TestValidateRejectsBadValues(t *testing.T) {
 	t.Parallel()
 	for _, bad := range []string{
-		"[rdap]\nonly-registries = [\"MARS\"]\n",
-		"[rdap]\nbatch = 0\n",
-		"[geoip]\nworker-count = 0\n",
+		"[registry-crawl.worker]\nonly-registries = [\"MARS\"]\n",
+		"[registry-crawl.worker]\nbatch = 0\n",
+		"[geoip.crawl-geofeeds]\nworker-count = 0\n",
 		"[fdns.resolve]\naf = \"5\"\n",
 		"[fdns.ingest-lists]\nonly = [\"alexa\"]\n",
 		"[fdns.seed-queue]\norder = \"random\"\n",
 		"[rdns.ingest]\nonly-registries = [\"NOPE\"]\n",
-		"[rpki]\nroutinator-addr = \"\"\n",
+		"[rpki.ingest]\nroutinator-addr = \"\"\n",
 		"[clickhouse]\nurl = \"http://user:s3cret@127.0.0.1:8123\"\n",
 	} {
 		if _, err := Parse([]byte(bad)); err == nil {
@@ -331,11 +400,14 @@ func TestLoadExampleFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !cfg.RDAP.Enabled || !cfg.RDAP.Ipnet || !cfg.FDNS.IngestCC.Enabled || !cfg.RDNS.CrawlPTR.Enabled {
+	if !cfg.RegistryCrawl.Worker.Enabled || !cfg.RegistryCrawl.Worker.Ipnet ||
+		!cfg.FDNS.IngestCC.Enabled || !cfg.RDNS.CrawlPTR.Enabled ||
+		!cfg.GeoIP.Lacnic.Enabled || !cfg.GeoIP.CrawlGeofeeds.Enabled ||
+		!cfg.RPKI.Ingest.Enabled {
 		t.Errorf("example file must enable every job: %+v", cfg)
 	}
-	if cfg.FDNS.IngestCC.Interval.Std() != 720*time.Hour || cfg.PeeringDB.Interval.Std() != 24*time.Hour || cfg.RPKI.Interval.Std() != time.Hour {
-		t.Errorf("example intervals: %+v %+v %+v", cfg.FDNS.IngestCC, cfg.PeeringDB, cfg.RPKI)
+	if cfg.FDNS.IngestCC.Interval.Std() != 720*time.Hour || cfg.PeeringDB.Interval.Std() != 24*time.Hour || cfg.RPKI.Ingest.Interval.Std() != time.Hour {
+		t.Errorf("example intervals: %+v %+v %+v", cfg.FDNS.IngestCC, cfg.PeeringDB, cfg.RPKI.Ingest)
 	}
 	wantResolvers := []string{"1.1.1.1", "8.8.8.8", "9.9.9.9", "208.67.222.222", "74.82.42.42"}
 	if len(cfg.FDNS.Resolve.Resolver) != len(wantResolvers) {
@@ -346,37 +418,37 @@ func TestLoadExampleFile(t *testing.T) {
 			t.Fatalf("example resolver=%v", cfg.FDNS.Resolve.Resolver)
 		}
 	}
-	if cfg.GeoIP.IPMapForce || cfg.GeoIP.AnycastForce {
-		t.Fatal("example ipmap-force and anycast-force must be false")
+	if cfg.GeoIP.IPMap.Force || cfg.GeoIP.Anycast.Force {
+		t.Fatal("example geoip.ipmap/anycast force must be false")
 	}
-	if len(cfg.Seed.OnlyRegistries) != 0 {
-		t.Fatalf("example seed only-registries=%v", cfg.Seed.OnlyRegistries)
+	if len(cfg.RegistryCrawl.Seed.OnlyRegistries) != 0 {
+		t.Fatalf("example seed only-registries=%v", cfg.RegistryCrawl.Seed.OnlyRegistries)
 	}
 }
 
-func TestRDAPOnlyRegistriesNormalized(t *testing.T) {
+func TestWorkerOnlyRegistriesNormalized(t *testing.T) {
 	t.Parallel()
-	cfg, err := Parse([]byte("[rdap]\nonly-registries = [\"arin\"]\n"))
+	cfg, err := Parse([]byte("[registry-crawl.worker]\nonly-registries = [\"arin\"]\n"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(cfg.RDAP.OnlyRegistries) != 1 || cfg.RDAP.OnlyRegistries[0] != "ARIN" {
-		t.Fatalf("only-registries=%v, want [ARIN]", cfg.RDAP.OnlyRegistries)
+	if len(cfg.RegistryCrawl.Worker.OnlyRegistries) != 1 || cfg.RegistryCrawl.Worker.OnlyRegistries[0] != "ARIN" {
+		t.Fatalf("only-registries=%v, want [ARIN]", cfg.RegistryCrawl.Worker.OnlyRegistries)
 	}
 }
 
 func TestProxyUserinfoAllowedAndTrimmed(t *testing.T) {
 	t.Parallel()
 	const secret = "s3cret-password"
-	cfg, err := Parse([]byte("[rdap]\nproxies = [\"  http://user:" + secret + "@127.0.0.1:8080  \"]\n"))
+	cfg, err := Parse([]byte("[registry-crawl.worker]\nproxies = [\"  http://user:" + secret + "@127.0.0.1:8080  \"]\n"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	want := "http://user:" + secret + "@127.0.0.1:8080"
-	if len(cfg.RDAP.Proxies) != 1 || cfg.RDAP.Proxies[0] != want {
-		t.Fatalf("proxies=%q, want trimmed %q", cfg.RDAP.Proxies, want)
+	if len(cfg.RegistryCrawl.Worker.Proxies) != 1 || cfg.RegistryCrawl.Worker.Proxies[0] != want {
+		t.Fatalf("proxies=%q, want trimmed %q", cfg.RegistryCrawl.Worker.Proxies, want)
 	}
-	if _, err := Parse([]byte("[rdap]\nproxies = [\"http://127.0.0.1:8080\"]\n")); err != nil {
+	if _, err := Parse([]byte("[registry-crawl.worker]\nproxies = [\"http://127.0.0.1:8080\"]\n")); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -385,7 +457,7 @@ func TestProxyParseErrorHidesSecret(t *testing.T) {
 	t.Parallel()
 	const secret = "s3cret-password"
 	raw := "http://user:" + secret + "@[::1"
-	_, err := Parse([]byte("[rdap]\nproxies = [\"" + raw + "\"]\n"))
+	_, err := Parse([]byte("[registry-crawl.worker]\nproxies = [\"" + raw + "\"]\n"))
 	if err == nil {
 		t.Fatal("expected a parse error")
 	}
@@ -400,11 +472,11 @@ func TestProxyParseErrorHidesSecret(t *testing.T) {
 
 func TestSeedOnlyRegistriesRoundTrip(t *testing.T) {
 	t.Parallel()
-	cfg, err := Parse([]byte("[seed]\nonly-registries = [\"ripe\", \"ARIN\"]\n"))
+	cfg, err := Parse([]byte("[registry-crawl.seed]\nonly-registries = [\"ripe\", \"ARIN\"]\n"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(cfg.Seed.OnlyRegistries) != 2 || cfg.Seed.OnlyRegistries[0] != "RIPE" || cfg.Seed.OnlyRegistries[1] != "ARIN" {
-		t.Fatalf("seed only-registries=%v", cfg.Seed.OnlyRegistries)
+	if len(cfg.RegistryCrawl.Seed.OnlyRegistries) != 2 || cfg.RegistryCrawl.Seed.OnlyRegistries[0] != "RIPE" || cfg.RegistryCrawl.Seed.OnlyRegistries[1] != "ARIN" {
+		t.Fatalf("seed only-registries=%v", cfg.RegistryCrawl.Seed.OnlyRegistries)
 	}
 }

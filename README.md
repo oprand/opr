@@ -73,7 +73,51 @@ That writes `bin/opr`. `make` with no target prints the Makefile help. `make tes
 
 `Dockerfile` builds only the CLI (Alpine image, entrypoint `/app/opr`). It does not start Postgres, ClickHouse, Unbound, or Routinator. Pass `--dsn` and the subcommand at `docker run` time.
 
-## Local dependencies
+### Scale out with different configs
+
+Several `opr run --config …` processes can share the same `OPR_DSN`. Each TOML turns jobs on/off with `enabled` (default true). Copy [opr.example.toml](opr.example.toml) and disable what that host should not run. Section names match CLI syntax (`[command]` or `[command.subcommand]`).
+
+**Bulk/periodic jobs** (registry-crawl.bulk, registry-crawl.seed, geoip.*, peeringdb, aspop, geonames, rpki.ingest, fdns.ingest-lists / ingest-cc / seed-queue, rdns.ingest): one host only each — two owners duplicate downloads/writes.
+
+**Queue jobs** (registry-crawl.worker, fdns.resolve, rdns.crawl-ptr, geoip.crawl-geofeeds): safe on multiple hosts (leases / `SKIP LOCKED`).
+
+Side deps only where needed (ClickHouse for cc/seed-queue, Routinator for rpki, Unbound for resolve). This is role split, not ASN-range sharding; `only-registries` can further narrow registry-crawl worker/seed.
+
+Registry bulk host (bulk + seed; disable the rest):
+
+```toml
+[registry-crawl.bulk]
+enabled = true
+
+[registry-crawl.seed]
+enabled = true
+
+[registry-crawl.worker]
+enabled = false
+# … disable geoip.*, peeringdb, aspop, geonames, rpki.ingest, fdns.*, rdns.*
+```
+
+RDAP worker host (bulk off; a second host can reuse the same file to scale the queue):
+
+```toml
+[registry-crawl.worker]
+enabled = true
+# ipnet = true  # if desired
+
+[registry-crawl.bulk]
+enabled = false
+
+[registry-crawl.seed]
+enabled = false
+# … disable the other bulk jobs
+```
+
+```sh
+opr run --config /etc/opr/whois.toml
+opr run --config /etc/opr/rdap.toml
+```
+
+## Runtime Local dependencies
 
 | Service | Required for | How to run it |
 | --- | --- | --- |
@@ -96,7 +140,7 @@ Report vulnerabilities privately — see [SECURITY.md](SECURITY.md).
 
 ### Verify a release
 
-`release-key.pub` is published at https://oprand.com/keys/release-key.pub. Import it, then check the checksum signature and hashes from a GitHub Release:
+The release key is published at https://oprand.com/keys/release-key.pub. Import it, then check the checksum signature and hashes from a GitHub Release:
 
 ```sh
 curl -O https://oprand.com/keys/release-key.pub

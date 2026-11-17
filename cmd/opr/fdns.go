@@ -19,17 +19,10 @@ func fdnsCommand() *cli.Command {
 	return &cli.Command{
 		Name:     "fdns",
 		Category: commandCategoryData,
-		Usage:    "Ingest popular hostnames (Tranco, Umbrella, CrUX) into fdns_host_name for later A/AAAA resolve. Each subcommand also runs as a job in opr run ([fdns.*] tables).",
-		Description: `Ingest popular hostnames (Tranco, Umbrella, CrUX) into fdns_host_name for later A/AAAA resolve.
+		Usage:    "Popular-hostname ingest and A/AAAA resolve into fdns_host_name / fdns_host_ip. Every subcommand but status also runs under opr run ([fdns.*]).",
+		Description: `Pick a subcommand. Lists and seed-queue fill fdns_resolve_queue; resolve drains it; ingest-cc loads Common Crawl Host Index into ClickHouse fdns_cc_host (run opr clickhouse migrate first).
 
-Subcommands:
-  ingest-lists  Download Tranco / Umbrella / CrUX, upsert fdns_host_name and enqueue fdns_resolve_queue. ETag skip. --force. --only=tranco,umbrella,crux
-  resolve       A/AAAA for names claimed from fdns_resolve_queue (SKIP LOCKED). Upserts fdns_host_ip source=dns. Default resolvers are five public recursives (1.1.1.1, 8.8.8.8, 9.9.9.9, 208.67.222.222, 74.82.42.42).
-  ingest-cc     Discover latest Host Index crawl from v2.paths.gz, download Parquet (~7–9 GiB), POST every part at ClickHouse (un-SURT + validate during the insert), EXCHANGE TABLES into fdns_cc_host. No Postgres hostname writes.
-  seed-queue    Filter ClickHouse fdns_cc_host into Postgres fdns_host_name (source=cc) + fdns_resolve_queue. Asserts ClickHouse SchemaVersion; run opr clickhouse migrate first.
-  status        Read-only board (list clocks, pending resolve, counts by source). Not implemented yet. Stays one-shot.
-
-Bare "opr fdns" prints this help.`,
+Needs: Postgres (--dsn) except ingest-cc (optional, ETag metadata only). seed-queue and ingest-cc also need ClickHouse flags.`,
 		Subcommands: []*cli.Command{
 			{
 				Name:  "ingest-lists",
@@ -64,15 +57,11 @@ Bare "opr fdns" prints this help.`,
 			{
 				Name:  "resolve",
 				Usage: "A/AAAA scan of fdns_resolve_queue into fdns_host_ip (source=dns). Defaults to five public resolvers. In opr run this is the continuous [fdns.resolve] job.",
-				Description: `Claim due names from fdns_resolve_queue with FOR UPDATE SKIP LOCKED and query A and/or AAAA.
+				Description: `Does: claim due names (FOR UPDATE SKIP LOCKED), query A/AAAA, write fdns_host_ip (source=dns). Does not scan all of fdns_host_name — only the queue filled by ingest-lists / seed-queue.
 
-Writes fdns_host_ip rows (name, ip, source=dns) for answers. NXDOMAIN and NODATA still stamp fdns_host_name.resolved_at, store zero dns IPs, and DELETE the queue row so the same name is not retried until seed-queue or list ingest enqueues it again. SERVFAIL, REFUSED, and timeouts do not stamp resolved_at; locked_at is cleared so the name is retried. CNAME is followed by the recursive resolver; only A/AAAA addresses are stored.
+Needs: Postgres. Default --resolver (repeatable or comma-separated; any value replaces defaults): 1.1.1.1, 8.8.8.8, 9.9.9.9, 208.67.222.222, 74.82.42.42. --qps is per resolver; public resolvers will rate-limit a full scan — use --resolver 127.0.0.1 for local-only.
 
-List ingest and seed-queue enqueue fdns_resolve_queue (resolve does not scan the whole fdns_host_name catalog). --lease / --batch / --worker-id match other SKIP LOCKED workers.
-
-Default --resolver is five public recursives: 1.1.1.1 (Cloudflare), 8.8.8.8 (Google), 9.9.9.9 (Quad9), 208.67.222.222 (OpenDNS), 74.82.42.42 (Hurricane Electric). Repeatable (--resolver a --resolver b) or comma-separated. Passing --resolver at least once replaces the defaults (they are not merged). A full catalog scan will get rate-limited; pass --resolver 127.0.0.1 for local-only.
-
---qps is per resolver (pool cap is --qps times resolver count; default 500 per resolver). --af=4|6|both (default both). --limit caps names this run (tests/smoke). --stale-after is unused at claim time (kept so existing scripts do not fail); enqueue-time freshness from seed-queue / ingest-lists decides who is in the queue. Successful resolve DELETEs the queue row, so a later resolved_at window cannot reclaim it. Re-run seed-queue or ingest-lists --force to refresh.`,
+When: after names are enqueued; continuous under opr run. NXDOMAIN/NODATA stamp resolved_at and DELETE the queue row; SERVFAIL/timeouts retry. --stale-after is unused at claim time (re-run seed-queue or ingest-lists --force to refresh).`,
 				Flags: []cli.Flag{
 					&cli.Float64Flag{
 						Name:  "qps",
@@ -123,11 +112,11 @@ Default --resolver is five public recursives: 1.1.1.1 (Cloudflare), 8.8.8.8 (Goo
 			{
 				Name:  "seed-queue",
 				Usage: "Filter ClickHouse fdns_cc_host into Postgres fdns_host_name + fdns_resolve_queue. In opr run this is the periodic [fdns.seed-queue] job.",
-				Description: `Copy a filtered slice of ClickHouse fdns_cc_host into Postgres. ingest-cc does not write fdns_host_name; this command does (source=cc union, Tranco ranks kept). Each name is re-normalized with Go NormalizeHostname for IDNA parity with list ingest, then COPY/upserted and inserted into fdns_resolve_queue ON CONFLICT DO NOTHING, skipping names already resolved and still fresh.
+				Description: `Does: copy a filtered slice of ClickHouse fdns_cc_host into Postgres fdns_host_name (source=cc; NormalizeHostname for IDNA parity) and fdns_resolve_queue. ingest-cc does not write hostnames — this subcommand does.
 
---order key (default) pages on (url_host_tld, host_name) matching the table sort key and persists the cursor in remote_files_metadata as fdns:cc-seed-cursor. --order rank is top-N by hcrank10/prank10 with no cursor, paged in the same COPY batch size via LIMIT/OFFSET so a 5M --limit is not loaded at once. --tld is repeatable. Empty --crawl does not filter crawl. --queue-high-water skips seeding when the approximate fdns_resolve_queue size (pg_class.reltuples: ANALYZE lag, locked+unlocked, not due) is already >= N (0 = disabled) and caps this run's inserts to N minus that approximate size. --dry-run prints a count/sample and writes nothing to Postgres.
+Needs: Postgres (--dsn) and ClickHouse. Run opr clickhouse migrate first (version assert only here).
 
-Run opr clickhouse migrate first. This command only asserts the schema version and exits if it does not match. --dsn is required.`,
+When: after ingest-cc. --order key pages with fdns:cc-seed-cursor; --order rank is top-N. --queue-high-water skips/caps when approximate fdns_resolve_queue size (pg_class.reltuples) is already high.`,
 				Flags: append([]cli.Flag{
 					&cli.Int64Flag{
 						Name:  "min-fetch-200",
@@ -178,15 +167,11 @@ Run opr clickhouse migrate first. This command only asserts the schema version a
 			{
 				Name:  "ingest-cc",
 				Usage: "Discover, download, and load one Common Crawl Host Index crawl into ClickHouse fdns_cc_host. In opr run this is the periodic [fdns.ingest-cc] job.",
-				Description: `Discover a Host Index crawl id (default: latest crawl id present in https://data.commoncrawl.org/projects/host-index-testing/v2.paths.gz) and GET that crawl's ~30 Parquet parts from https://data.commoncrawl.org into --parquet-dir.
+				Description: `Does: discover a Host Index crawl (default latest in v2.paths.gz), GET ~30 Parquet parts into --parquet-dir (~7–9 GiB), POST each part into ClickHouse, then EXCHANGE TABLES into fdns_cc_host. Writes no Postgres hostnames — use seed-queue next.
 
-Host Index testing v2 may lag monthly crawls (paths list only crawls that have been indexed). Resume: skip files whose stored ETag and Content-Length already match local size unless --force. Missing or zero Content-Length never skips. --skip-download verifies existing files and does not GET parquet (fails if any file is missing or size-mismatched). Parallel GETs are capped (6). The ClickHouse load starts only after a complete download (or verified --skip-download).
+Needs: ClickHouse HTTP. Run opr clickhouse migrate first. --dsn optional (ETag resume metadata only).
 
-Load POSTs each verified part at the ClickHouse HTTP interface. ClickHouse un-SURTs surt_host_name, drops names that fail the validDNSName regex, and keeps the 42 physical Host Index columns. crawl is a hive path segment, not a Parquet column; the insert sets it from the manifest id. Parts land in fdns_cc_host_load and are recorded in fdns_cc_load_part, so a failed run retries only the parts that did not land; a complete load ends with EXCHANGE TABLES fdns_cc_host AND fdns_cc_host_load, so the live table is never empty. Writes no Postgres hostname rows and no fdns_host_ip: opr fdns seed-queue is what moves a filtered slice into Postgres. --dsn is optional here and is used only to persist ETag resume metadata.
-
-Run opr clickhouse migrate first. This command only asserts the schema version and exits if it does not match.
-
---parquet-dir defaults to UserCacheDir()/opr/cc-host-index (separate from any old URL-index cache). Plan on ~7–9 GiB parquet. --keep-parquet (default true) retains it after a successful load.`,
+When: before seed-queue / resolve of CC names. Resume skips matching ETag+size unless --force; --skip-download verifies local parquet only.`,
 				Flags: append([]cli.Flag{
 					&cli.StringFlag{
 						Name:  "crawl",
