@@ -1,13 +1,13 @@
 # opr network data aggregator CLI.
 #
 # This image has no default Postgres DSN, no config file, and no API keys.
-# One-shots take --dsn (or OPR_DSN). The daemon takes only --config and
-# reads OPR_DSN, OPR_CLICKHOUSE_PASSWORD, OPR_PEERINGDB_APIKEY from the
+# One-shots take --postgres-db (or OPR_POSTGRES_DB). The daemon takes only --config and
+# reads OPR_POSTGRES_DB, OPR_CLICKHOUSE_PASSWORD, OPR_PEERINGDB_APIKEY from the
 # environment.
 #
 #   docker build -t opr .
-#   docker run --rm opr --dsn "$DSN" --log-level=INFO aspop
-#   docker run --rm -e OPR_DSN="$DSN" -e OPR_PEERINGDB_APIKEY="$KEY" \
+#   docker run --rm opr --postgres-db "$DSN" --log-level=INFO aspop
+#   docker run --rm -e OPR_POSTGRES_DB="$DSN" -e OPR_PEERINGDB_APIKEY="$KEY" \
 #     -v ./opr.config.toml:/etc/opr/opr.config.toml:ro \
 #     opr --log-console run --config /etc/opr/opr.config.toml
 #

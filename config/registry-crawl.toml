@@ -1,0 +1,79 @@
+# Registry seed and bulk whois.
+#
+# opr run --config examples/registry-crawl.toml
+#
+# Secrets stay in the environment. Postgres only:
+#   OPR_POSTGRES_DB  Postgres connection string (required for `opr run`)
+#
+# Omitted keys keep the one-shot defaults. Omitted `enabled` means true, so
+# every other job is listed with enabled = false. Otherwise `opr run` would
+# start fdns.ingest-cc and the RDAP worker.
+
+[registry-crawl.seed]
+enabled = true
+interval = "24h"
+skip-ribs = false
+only-registries = []        # empty = all five
+delegated-stats-url = "https://ftp.ripe.net/pub/stats/ripencc/nro-stats/latest/nro-delegated-stats"
+
+[registry-crawl.bulk]
+# Already backfills RIPE asnames at the end. There is no
+# [registry-crawl.asnames] daemon table; the one-shot is
+# `opr registry-crawl asnames`.
+enabled = true
+period = "1h"
+buffer-max-size = 5000
+with-route-objects = true   # IRR routes, not RDAP
+prefetch = 3
+asnames-url = "https://ftp.ripe.net/ripe/asnames/asn.txt"
+
+[registry-crawl.worker]
+# Stays off. This is a long RDAP queue (ARIN/LACNIC by default) and should
+# run only after seed has filled crawl_target. To turn it on: enabled = true
+# and ipnet = true.
+enabled = false
+ipnet = false
+
+# Every other job stays off.
+
+[geonames]
+enabled = false
+
+[peeringdb]
+enabled = false
+
+[aspop]
+enabled = false
+
+[geoip.lacnic]
+enabled = false
+
+[geoip.ipmap]
+enabled = false
+
+[geoip.anycast]
+enabled = false
+
+[geoip.crawl-geofeeds]
+enabled = false
+
+[rpki.ingest]
+enabled = false
+
+[fdns.ingest-lists]
+enabled = false
+
+[fdns.resolve]
+enabled = false
+
+[fdns.ingest-cc]
+enabled = false
+
+[fdns.seed-queue]
+enabled = false
+
+[rdns.ingest]
+enabled = false
+
+[rdns.crawl-ptr]
+enabled = false

@@ -40,11 +40,11 @@ func NewGeoIpAggregator(c *cli.Context) (*GeoIpAggregator, error) {
 	}
 	logger = logger.Named("opr.geoip")
 
-	netStore, err := postgres.New(logger.Named("store"), c.String("dsn"))
+	netStore, err := postgres.New(logger.Named("store"), c.String("postgres-db"))
 	if err != nil {
 		return nil, err
 	}
-	err = postgres.RunMigrations(logger.Named("store"), c.String("dsn"))
+	err = postgres.RunMigrations(logger.Named("store"), c.String("postgres-db"))
 	if err != nil {
 		return nil, err
 	}

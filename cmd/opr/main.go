@@ -161,8 +161,8 @@ func newCLIApp() *cli.App {
 
 	cliapp.Flags = []cli.Flag{
 		&cli.StringFlag{
-			Name:  "dsn",
-			Usage: "PostgreSQL connection string. Eg: `postgresql://usr:pwd@ip:port/dbname?opt=val`. Required for every command except `run` (reads OPR_DSN only), `clickhouse`, `fdns ingest-cc` (ETag metadata only, and only when set), and help. One-shots fall back to OPR_DSN when this flag is empty.",
+			Name:  "postgres-db",
+			Usage: "PostgreSQL connection string. Eg: `postgresql://usr:pwd@ip:port/dbname?opt=val`. Required for every command except `run` (reads OPR_POSTGRES_DB only), `clickhouse`, `fdns ingest-cc` (ETag metadata only, and only when set), and help. One-shots fall back to OPR_POSTGRES_DB when this flag is empty.",
 			// Not Required: urfave checkRequiredFlags runs on the root command
 			// before it dispatches a subcommand, so a required global flag
 			// blocks ClickHouse-only commands. requirePostgresDSN enforces it.
@@ -269,12 +269,12 @@ func newCLIApp() *cli.App {
 		Name:     "run",
 		Aliases:  []string{"r"},
 		Category: commandCategoryData,
-		Usage:    "Run every enabled ingest job from opr.config.toml until SIGINT/SIGTERM. Only flag: --config. Secrets come from OPR_DSN, OPR_CLICKHOUSE_PASSWORD, OPR_PEERINGDB_APIKEY.",
+		Usage:    "Run every enabled ingest job from opr.config.toml until SIGINT/SIGTERM. Only flag: --config. Secrets come from OPR_POSTGRES_DB, OPR_CLICKHOUSE_PASSWORD, OPR_PEERINGDB_APIKEY.",
 		Description: `Start one goroutine per job enabled in the TOML file and run until SIGINT or SIGTERM.
 
 Config path: --config, else OPR_CONFIG, else ~/.config/opr.config.toml. The file must exist; copy opr.example.toml there. Every job table has enabled (default true); omitted keys keep the one-shot flag defaults. Unknown keys are errors.
 
-Secrets are never read from the file: OPR_DSN (required), OPR_CLICKHOUSE_PASSWORD, OPR_PEERINGDB_APIKEY. --dsn is not accepted on run.
+Secrets are never read from the file: OPR_POSTGRES_DB (required), OPR_CLICKHOUSE_PASSWORD, OPR_PEERINGDB_APIKEY. --postgres-db is not accepted on run.
 
 Jobs: rdap (autnum + ipnet queue workers), seed, whoisdb, geonames, peeringdb, aspop, geoip (lacnic, ipmap, anycast, geofeeds), rpki, fdns.ingest-lists, fdns.resolve, fdns.ingest-cc, fdns.seed-queue, rdns.ingest, rdns.crawl-ptr. Status boards, geonames flags, mark-ipnet-bulk, asnames, geoip prune, and the postgres/clickhouse schema commands stay one-shot.`,
 		Flags: []cli.Flag{
@@ -431,17 +431,17 @@ Jobs: rdap (autnum + ipnet queue workers), seed, whoisdb, geonames, peeringdb, a
 
 }
 
-// requirePostgresDSN enforces --dsn for commands that talk to Postgres.
+// requirePostgresDSN enforces --postgres-db for commands that talk to Postgres.
 // urfave's unexported checkRequiredFlags runs on the root command before it
 // dispatches a subcommand, so a Required global flag would also reject
 // `opr clickhouse` and `opr fdns ingest-cc`. Help does not connect, so
-// `opr help` and `opr postgres --help` do not need --dsn. `postgres migrate`
+// `opr help` and `opr postgres --help` do not need --postgres-db. `postgres migrate`
 // and `postgres version` still do. Zero positional args is bare `opr`, which
 // shows the same app help after this hook returns. An empty arg list must
-// pass here or that path exits on a missing --dsn.
+// pass here or that path exits on a missing --postgres-db.
 //
-// One-shots fall back to OPR_DSN when --dsn is empty. `run` is skipped
-// here entirely: it reads OPR_DSN itself and rejects --dsn, so the flag
+// One-shots fall back to OPR_POSTGRES_DB when --postgres-db is empty. `run` is skipped
+// here entirely: it reads OPR_POSTGRES_DB itself and rejects --postgres-db, so the flag
 // is never confused with the environment (see runDaemon).
 func requirePostgresDSN(c *cli.Context) error {
 	if !c.Args().Present() {
@@ -451,14 +451,14 @@ func requirePostgresDSN(c *cli.Context) error {
 	if isRunCommand(args) || helpRequested(args) {
 		return nil
 	}
-	if strings.TrimSpace(c.String("dsn")) == "" {
+	if strings.TrimSpace(c.String("postgres-db")) == "" {
 		if env := strings.TrimSpace(os.Getenv(opconfig.EnvDSN)); env != "" {
-			return c.Set("dsn", env)
+			return c.Set("postgres-db", env)
 		}
 		if postgresDSNOptional(args) {
 			return nil
 		}
-		return fmt.Errorf("Required flag %q not set", "dsn")
+		return fmt.Errorf("Required flag %q not set", "postgres-db")
 	}
 	return nil
 }
@@ -471,7 +471,7 @@ func isRunCommand(args []string) bool {
 
 // helpRequested is true for the help command and for --help / -h on any
 // command. A bare "h" counts only as the help alias in the first position,
-// so a later flag value of "h" still requires --dsn.
+// so a later flag value of "h" still requires --postgres-db.
 func helpRequested(args []string) bool {
 	if len(args) > 0 && (args[0] == "help" || args[0] == "h") {
 		return true
@@ -569,7 +569,7 @@ func runRegistryCrawlSeed(c *cli.Context) error {
 		}
 	}
 
-	dsn := c.String("dsn")
+	dsn := c.String("postgres-db")
 	if err := postgres.RunMigrations(logger.Named("store"), dsn); err != nil {
 		return err
 	}

@@ -201,7 +201,7 @@ func runRDNSIngest(c *cli.Context) error {
 		return err
 	}
 
-	dsn := c.String("dsn")
+	dsn := c.String("postgres-db")
 	if err := postgres.RunMigrations(logger.Named("store"), dsn); err != nil {
 		return err
 	}
@@ -316,7 +316,7 @@ func runRDNSStatus(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	st, err := postgres.New(logger.Named("store"), c.String("dsn"))
+	st, err := postgres.New(logger.Named("store"), c.String("postgres-db"))
 	if err != nil {
 		return err
 	}
@@ -350,7 +350,7 @@ func runRDNSCrawlPTR(c *cli.Context) error {
 		return err
 	}
 
-	dsn := c.String("dsn")
+	dsn := c.String("postgres-db")
 	if err := postgres.RunMigrations(logger.Named("store"), dsn); err != nil {
 		return err
 	}

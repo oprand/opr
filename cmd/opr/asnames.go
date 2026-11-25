@@ -19,7 +19,7 @@ func runASNamesBackfill(c *cli.Context) error {
 	}
 	logger = logger.Named("opr.asnames")
 
-	dsn := c.String("dsn")
+	dsn := c.String("postgres-db")
 	if err := postgres.RunMigrations(logger.Named("store"), dsn); err != nil {
 		return err
 	}

@@ -412,7 +412,7 @@ func TestCLIRegistersFDNSSurface(t *testing.T) {
 	for _, want := range []string{
 		"crawl", "parquet-dir",
 		"force", "skip-download", "keep-parquet",
-		"clickhouse-url", "clickhouse-database", "clickhouse-user", "clickhouse-password", "clickhouse-timeout",
+		"clickhouse-url", "clickhouse-db", "clickhouse-user", "clickhouse-password", "clickhouse-timeout",
 	} {
 		if !ccFlags[want] {
 			t.Errorf("fdns ingest-cc missing flag %q", want)
@@ -452,7 +452,7 @@ func TestCLIRegistersFDNSSurface(t *testing.T) {
 	for _, want := range []string{
 		"min-fetch-200", "min-hcrank10", "min-prank10", "tld", "crawl",
 		"limit", "order", "queue-high-water", "dry-run", "stale-after",
-		"clickhouse-url", "clickhouse-database", "clickhouse-user", "clickhouse-password", "clickhouse-timeout",
+		"clickhouse-url", "clickhouse-db", "clickhouse-user", "clickhouse-password", "clickhouse-timeout",
 	} {
 		if !seedFlags[want] {
 			t.Errorf("fdns seed-queue missing flag %q", want)
@@ -514,7 +514,7 @@ func TestCLIRegistersClickHouseSurface(t *testing.T) {
 	}
 	migrateFlags := flagNameSet(migrate.Flags)
 	for _, want := range []string{
-		"clickhouse-url", "clickhouse-database", "clickhouse-user", "clickhouse-password",
+		"clickhouse-url", "clickhouse-db", "clickhouse-user", "clickhouse-password",
 		"clickhouse-timeout", "dry-run",
 	} {
 		if !migrateFlags[want] {
@@ -602,7 +602,7 @@ func TestCLIRegistersPostgresSurface(t *testing.T) {
 }
 
 func TestPostgresCommandsRequireDSN(t *testing.T) {
-	t.Setenv("OPR_DSN", "")
+	t.Setenv("OPR_POSTGRES_DB", "")
 	app := newCLIApp()
 	app.Writer = io.Discard
 	app.ErrWriter = io.Discard
@@ -614,12 +614,12 @@ func TestPostgresCommandsRequireDSN(t *testing.T) {
 		t.Fatal(err)
 	}
 	err := app.Run([]string{"opr", "postgres", "version"})
-	if err == nil || !strings.Contains(err.Error(), `Required flag "dsn" not set`) {
-		t.Fatalf("version err=%v, want --dsn required", err)
+	if err == nil || !strings.Contains(err.Error(), `Required flag "postgres-db" not set`) {
+		t.Fatalf("version err=%v, want --postgres-db required", err)
 	}
 	err = app.Run([]string{"opr", "postgres", "migrate"})
-	if err == nil || !strings.Contains(err.Error(), `Required flag "dsn" not set`) {
-		t.Fatalf("migrate err=%v, want --dsn required", err)
+	if err == nil || !strings.Contains(err.Error(), `Required flag "postgres-db" not set`) {
+		t.Fatalf("migrate err=%v, want --postgres-db required", err)
 	}
 }
 
@@ -784,8 +784,8 @@ func TestClickHouseFlagDefaults(t *testing.T) {
 	if got := c.String("clickhouse-url"); got != clickhouse.DefaultURL {
 		t.Errorf("clickhouse-url default=%q, want %q", got, clickhouse.DefaultURL)
 	}
-	if got := c.String("clickhouse-database"); got != clickhouse.DefaultDatabase {
-		t.Errorf("clickhouse-database default=%q, want %q", got, clickhouse.DefaultDatabase)
+	if got := c.String("clickhouse-db"); got != clickhouse.DefaultDatabase {
+		t.Errorf("clickhouse-db default=%q, want %q", got, clickhouse.DefaultDatabase)
 	}
 	if got := c.Duration("clickhouse-timeout"); got != clickhouse.DefaultTimeout {
 		t.Errorf("clickhouse-timeout default=%s, want %s", got, clickhouse.DefaultTimeout)
@@ -797,7 +797,7 @@ func TestClickHouseFlagDefaults(t *testing.T) {
 }
 
 func TestClickHouseCommandsDoNotRequireDSN(t *testing.T) {
-	t.Setenv("OPR_DSN", "")
+	t.Setenv("OPR_POSTGRES_DB", "")
 	app := newCLIApp()
 	app.Writer = io.Discard
 	app.ErrWriter = io.Discard
@@ -809,12 +809,12 @@ func TestClickHouseCommandsDoNotRequireDSN(t *testing.T) {
 		t.Fatal(err)
 	}
 	err := app.Run([]string{"opr", "fdns", "ingest-lists"})
-	if err == nil || !strings.Contains(err.Error(), `Required flag "dsn" not set`) {
-		t.Fatalf("err=%v, want --dsn required for postgres commands", err)
+	if err == nil || !strings.Contains(err.Error(), `Required flag "postgres-db" not set`) {
+		t.Fatalf("err=%v, want --postgres-db required for postgres commands", err)
 	}
 	err = app.Run([]string{"opr", "fdns", "seed-queue"})
-	if err == nil || !strings.Contains(err.Error(), `Required flag "dsn" not set`) {
-		t.Fatalf("seed-queue err=%v, want --dsn required", err)
+	if err == nil || !strings.Contains(err.Error(), `Required flag "postgres-db" not set`) {
+		t.Fatalf("seed-queue err=%v, want --postgres-db required", err)
 	}
 }
 
@@ -946,7 +946,7 @@ func TestRunCommandHasOnlyConfigFlag(t *testing.T) {
 		t.Errorf("run --config must not use urfave EnvVars (precedence is resolved explicitly), got %v", sf.EnvVars)
 	}
 	blob := strings.ToLower(run.Usage + " " + run.Description)
-	for _, phrase := range []string{"--config", "opr_config", "opr.config.toml", "opr_dsn", "opr_clickhouse_password", "opr_peeringdb_apikey"} {
+	for _, phrase := range []string{"--config", "opr_config", "opr.config.toml", "opr_postgres_db", "opr_clickhouse_password", "opr_peeringdb_apikey"} {
 		if !strings.Contains(blob, phrase) {
 			t.Errorf("run help missing %q", phrase)
 		}
@@ -959,7 +959,7 @@ func TestRunCommandHasOnlyConfigFlag(t *testing.T) {
 }
 
 func TestRunRejectsOtherFlagsAndArgs(t *testing.T) {
-	t.Setenv("OPR_DSN", "")
+	t.Setenv("OPR_POSTGRES_DB", "")
 	t.Setenv("OPR_CONFIG", "")
 	cfgPath := writeTempConfig(t, "")
 
@@ -982,16 +982,16 @@ func TestRunRejectsOtherFlagsAndArgs(t *testing.T) {
 	app := newCLIApp()
 	app.Writer = io.Discard
 	app.ErrWriter = io.Discard
-	err := app.Run([]string{"opr", "--dsn", "postgresql://u:p@127.0.0.1:1/db", "run", "--config", cfgPath})
-	if err == nil || !strings.Contains(err.Error(), "OPR_DSN") || !strings.Contains(err.Error(), "--dsn") {
-		t.Fatalf("run with --dsn err=%v, want rejection pointing at OPR_DSN", err)
+	err := app.Run([]string{"opr", "--postgres-db", "postgresql://u:p@127.0.0.1:1/db", "run", "--config", cfgPath})
+	if err == nil || !strings.Contains(err.Error(), "OPR_POSTGRES_DB") || !strings.Contains(err.Error(), "--postgres-db") {
+		t.Fatalf("run with --postgres-db err=%v, want rejection pointing at OPR_POSTGRES_DB", err)
 	}
 }
 
 func TestRunConfigPathPrecedenceAndMissingFile(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
-	t.Setenv("OPR_DSN", "")
+	t.Setenv("OPR_POSTGRES_DB", "")
 	t.Setenv("OPR_CONFIG", "")
 
 	// Default path: missing file is an error and is not created.
@@ -1024,7 +1024,7 @@ func TestRunConfigPathPrecedenceAndMissingFile(t *testing.T) {
 }
 
 func TestRunRequiresOPRDSNBeforeConnecting(t *testing.T) {
-	t.Setenv("OPR_DSN", "")
+	t.Setenv("OPR_POSTGRES_DB", "")
 	t.Setenv("OPR_CONFIG", "")
 	cfgPath := writeTempConfig(t, "")
 
@@ -1032,14 +1032,14 @@ func TestRunRequiresOPRDSNBeforeConnecting(t *testing.T) {
 	app.Writer = io.Discard
 	app.ErrWriter = io.Discard
 	err := app.Run([]string{"opr", "run", "--config", cfgPath})
-	if err == nil || !strings.Contains(err.Error(), "OPR_DSN") {
-		t.Fatalf("run without OPR_DSN err=%v, want OPR_DSN required", err)
+	if err == nil || !strings.Contains(err.Error(), "OPR_POSTGRES_DB") {
+		t.Fatalf("run without OPR_POSTGRES_DB err=%v, want OPR_POSTGRES_DB required", err)
 	}
 
-	// A secret in the file is rejected before OPR_DSN is even looked at.
+	// A secret in the file is rejected before OPR_POSTGRES_DB is even looked at.
 	secretPath := writeTempConfig(t, "[peeringdb]\napikey = \"x\"\n")
 	err = app.Run([]string{"opr", "run", "--config", secretPath})
-	if err == nil || !strings.Contains(err.Error(), "OPR_PEERINGDB_APIKEY") || strings.Contains(err.Error(), "requires the OPR_DSN") {
+	if err == nil || !strings.Contains(err.Error(), "OPR_PEERINGDB_APIKEY") || strings.Contains(err.Error(), "requires the OPR_POSTGRES_DB") {
 		t.Fatalf("run with secret in file err=%v, want secret rejection", err)
 	}
 
@@ -1052,11 +1052,11 @@ func TestRunRequiresOPRDSNBeforeConnecting(t *testing.T) {
 }
 
 func TestOneShotsDoNotAcceptConfigFlag(t *testing.T) {
-	t.Setenv("OPR_DSN", "")
+	t.Setenv("OPR_POSTGRES_DB", "")
 	for _, args := range [][]string{
-		{"opr", "--dsn", "postgresql://u:p@127.0.0.1:1/db", "aspop", "--config", "/tmp/x.toml"},
-		{"opr", "--dsn", "postgresql://u:p@127.0.0.1:1/db", "registry-crawl", "seed", "--config", "/tmp/x.toml"},
-		{"opr", "--config", "/tmp/x.toml", "--dsn", "postgresql://u:p@127.0.0.1:1/db", "aspop"},
+		{"opr", "--postgres-db", "postgresql://u:p@127.0.0.1:1/db", "aspop", "--config", "/tmp/x.toml"},
+		{"opr", "--postgres-db", "postgresql://u:p@127.0.0.1:1/db", "registry-crawl", "seed", "--config", "/tmp/x.toml"},
+		{"opr", "--config", "/tmp/x.toml", "--postgres-db", "postgresql://u:p@127.0.0.1:1/db", "aspop"},
 	} {
 		app := newCLIApp()
 		app.Writer = io.Discard
@@ -1069,7 +1069,7 @@ func TestOneShotsDoNotAcceptConfigFlag(t *testing.T) {
 }
 
 func TestOneShotsFallBackToOPRDSN(t *testing.T) {
-	t.Setenv("OPR_DSN", "postgresql://u:p@127.0.0.1:1/db?connect_timeout=1")
+	t.Setenv("OPR_POSTGRES_DB", "postgresql://u:p@127.0.0.1:1/db?connect_timeout=1")
 	app := newCLIApp()
 	app.Writer = io.Discard
 	app.ErrWriter = io.Discard
@@ -1079,8 +1079,8 @@ func TestOneShotsFallBackToOPRDSN(t *testing.T) {
 	if err == nil {
 		t.Skip("postgres version unexpectedly reached a database on 127.0.0.1:1")
 	}
-	if strings.Contains(err.Error(), `Required flag "dsn" not set`) {
-		t.Fatalf("one-shot must fall back to OPR_DSN when --dsn is empty, got %v", err)
+	if strings.Contains(err.Error(), `Required flag "postgres-db" not set`) {
+		t.Fatalf("one-shot must fall back to OPR_POSTGRES_DB when --postgres-db is empty, got %v", err)
 	}
 }
 

@@ -52,7 +52,7 @@ const (
 )
 
 // Daemon is `opr run`: one goroutine per enabled job from opr.config.toml.
-// Secrets come from the environment; nothing here reads --dsn.
+// Secrets come from the environment; nothing here reads --postgres-db.
 type Daemon struct {
 	logger *zap.Logger
 	cfg    *opconfig.Config
@@ -64,14 +64,14 @@ type Daemon struct {
 }
 
 // runDaemon is the `run` Action. Order matters: resolve and load the
-// config, then require OPR_DSN, then migrate once, then start loops.
-// Nothing connects anywhere before OPR_DSN is checked.
+// config, then require OPR_POSTGRES_DB, then migrate once, then start loops.
+// Nothing connects anywhere before OPR_POSTGRES_DB is checked.
 func runDaemon(c *cli.Context) error {
 	if c.Args().Present() {
 		return fmt.Errorf("opr run takes no arguments, got %q", c.Args().First())
 	}
-	if strings.TrimSpace(c.String("dsn")) != "" {
-		return fmt.Errorf("opr run does not accept --dsn; set the %s environment variable", opconfig.EnvDSN)
+	if strings.TrimSpace(c.String("postgres-db")) != "" {
+		return fmt.Errorf("opr run does not accept --postgres-db; set the %s environment variable", opconfig.EnvDSN)
 	}
 
 	path, err := opconfig.ResolvePath(c.String("config"))

@@ -22,7 +22,7 @@ func fdnsCommand() *cli.Command {
 		Usage:    "Popular-hostname ingest and A/AAAA resolve into fdns_host_name / fdns_host_ip. Every subcommand but status also runs under opr run ([fdns.*]).",
 		Description: `Pick a subcommand. Lists and seed-queue fill fdns_resolve_queue; resolve drains it; ingest-cc loads Common Crawl Host Index into ClickHouse fdns_cc_host (run opr clickhouse migrate first).
 
-Needs: Postgres (--dsn) except ingest-cc (optional, ETag metadata only). seed-queue and ingest-cc also need ClickHouse flags.`,
+Needs: Postgres (--postgres-db) except ingest-cc (optional, ETag metadata only). seed-queue and ingest-cc also need ClickHouse flags.`,
 		Subcommands: []*cli.Command{
 			{
 				Name:  "ingest-lists",
@@ -114,7 +114,7 @@ When: after names are enqueued; continuous under opr run. NXDOMAIN/NODATA stamp 
 				Usage: "Filter ClickHouse fdns_cc_host into Postgres fdns_host_name + fdns_resolve_queue. In opr run this is the periodic [fdns.seed-queue] job.",
 				Description: `Does: copy a filtered slice of ClickHouse fdns_cc_host into Postgres fdns_host_name (source=cc; NormalizeHostname for IDNA parity) and fdns_resolve_queue. ingest-cc does not write hostnames — this subcommand does.
 
-Needs: Postgres (--dsn) and ClickHouse. Run opr clickhouse migrate first (version assert only here).
+Needs: Postgres (--postgres-db) and ClickHouse. Run opr clickhouse migrate first (version assert only here).
 
 When: after ingest-cc. --order key pages with fdns:cc-seed-cursor; --order rank is top-N. --queue-high-water skips/caps when approximate fdns_resolve_queue size (pg_class.reltuples) is already high.`,
 				Flags: append([]cli.Flag{
@@ -169,7 +169,7 @@ When: after ingest-cc. --order key pages with fdns:cc-seed-cursor; --order rank 
 				Usage: "Discover, download, and load one Common Crawl Host Index crawl into ClickHouse fdns_cc_host. In opr run this is the periodic [fdns.ingest-cc] job.",
 				Description: `Does: discover a Host Index crawl (default latest in v2.paths.gz), GET ~30 Parquet parts into --parquet-dir (~7–9 GiB), POST each part into ClickHouse, then EXCHANGE TABLES into fdns_cc_host. Writes no Postgres hostnames — use seed-queue next.
 
-Needs: ClickHouse HTTP. Run opr clickhouse migrate first. --dsn optional (ETag resume metadata only).
+Needs: ClickHouse HTTP. Run opr clickhouse migrate first. --postgres-db optional (ETag resume metadata only).
 
 When: before seed-queue / resolve of CC names. Resume skips matching ETag+size unless --force; --skip-download verifies local parquet only.`,
 				Flags: append([]cli.Flag{
@@ -237,7 +237,7 @@ func runFDNSIngestCC(c *cli.Context) error {
 	}
 
 	var in *fdns.CCIngestor
-	if dsn := strings.TrimSpace(c.String("dsn")); dsn != "" {
+	if dsn := strings.TrimSpace(c.String("postgres-db")); dsn != "" {
 		if err := postgres.RunMigrations(logger.Named("store"), dsn); err != nil {
 			return err
 		}
@@ -276,7 +276,7 @@ func runFDNSIngestLists(c *cli.Context) error {
 		return err
 	}
 
-	dsn := c.String("dsn")
+	dsn := c.String("postgres-db")
 	if err := postgres.RunMigrations(logger.Named("store"), dsn); err != nil {
 		return err
 	}
@@ -314,7 +314,7 @@ func runFDNSResolve(c *cli.Context) error {
 		return fmt.Errorf("fdns resolve: --qps must be >= 0")
 	}
 
-	dsn := c.String("dsn")
+	dsn := c.String("postgres-db")
 	if err := postgres.RunMigrations(logger.Named("store"), dsn); err != nil {
 		return err
 	}
@@ -351,7 +351,7 @@ func runFDNSSeedQueue(c *cli.Context) error {
 	}
 	logger = logger.Named("opr.fdns.seed-queue")
 
-	dsn := strings.TrimSpace(c.String("dsn"))
+	dsn := strings.TrimSpace(c.String("postgres-db"))
 	if err := postgres.RunMigrations(logger.Named("store"), dsn); err != nil {
 		return err
 	}

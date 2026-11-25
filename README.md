@@ -1,4 +1,4 @@
-![CI](https://github.com/oprand/opr/actions/workflows/test.yml/badge.svg) ![Go Reference](https://pkg.go.dev/badge/github.com/oprand/opr.svg) ![License](https://img.shields.io/github/license/oprand/opr)
+[![CI](https://github.com/oprand/opr/actions/workflows/test.yml/badge.svg)](https://github.com/oprand/opr/actions/workflows/test.yml) [![Go Reference](https://pkg.go.dev/badge/github.com/oprand/opr.svg)](https://pkg.go.dev/github.com/oprand/opr) [![License](https://img.shields.io/github/license/oprand/opr)](LICENSE)
 
 # `opr`: Internet Network Data Aggregator
 
@@ -59,7 +59,28 @@ The whole system can be setup using the Makefile at the root of the repository, 
   - Sources: —
   - Store: ClickHouse
 
-Run `opr help` to see the help text for each command and `opr <command> --help` to see the help text for each command.
+Run `bin/opr help` for the command list and `bin/opr <command> --help` for one command.
+
+## Getting Started
+
+```sh
+make localdb
+export OPR_POSTGRES_DB='postgresql://opr:opr@127.0.0.1:5432/opr?sslmode=disable'
+make build
+bin/opr --postgres-db "$OPR_POSTGRES_DB" aspop
+```
+
+Or the sample daemon:
+
+```sh
+bin/opr run --config config/aspop-peeringdb.toml
+```
+
+The full [opr.example.toml](opr.example.toml) enables every ingest, including multi-GB whois and a ClickHouse job that needs a Docker VM larger than 16 GB; use a sample file first.
+
+[config/geoip-geonames.toml](config/geoip-geonames.toml) enables geoip and geonames.
+
+[config/registry-crawl.toml](config/registry-crawl.toml) enables registry-crawl seed and bulk, with the worker off.
 
 ## Build
 
@@ -71,11 +92,11 @@ make build
 
 That writes `bin/opr`. `make` with no target prints the Makefile help. `make test` runs `go test ./...`.
 
-`Dockerfile` builds only the CLI (Alpine image, entrypoint `/app/opr`). It does not start Postgres, ClickHouse, Unbound, or Routinator. Pass `--dsn` and the subcommand at `docker run` time.
+`Dockerfile` builds only the CLI (Alpine image, entrypoint `/app/opr`). It does not start Postgres, ClickHouse, Unbound, or Routinator. Pass `--postgres-db` and the subcommand at `docker run` time.
 
 ### Scale out with different configs
 
-Several `opr run --config …` processes can share the same `OPR_DSN`. Each TOML turns jobs on/off with `enabled` (default true). Copy [opr.example.toml](opr.example.toml) and disable what that host should not run. Section names match CLI syntax (`[command]` or `[command.subcommand]`).
+Several `opr run --config …` processes can share the same `OPR_POSTGRES_DB`. Each TOML turns jobs on/off with `enabled` (default true). Start from a sample: [config/aspop-peeringdb.toml](config/aspop-peeringdb.toml), [config/geoip-geonames.toml](config/geoip-geonames.toml), or [config/registry-crawl.toml](config/registry-crawl.toml). Section names match CLI syntax (`[command]` or `[command.subcommand]`).
 
 **Bulk/periodic jobs** (registry-crawl.bulk, registry-crawl.seed, geoip.*, peeringdb, aspop, geonames, rpki.ingest, fdns.ingest-lists / ingest-cc / seed-queue, rdns.ingest): one host only each — two owners duplicate downloads/writes.
 
@@ -83,7 +104,7 @@ Several `opr run --config …` processes can share the same `OPR_DSN`. Each TOML
 
 Side deps only where needed (ClickHouse for cc/seed-queue, Routinator for rpki, Unbound for resolve). This is role split, not ASN-range sharding; `only-registries` can further narrow registry-crawl worker/seed.
 
-Registry bulk host (bulk + seed; disable the rest):
+Registry bulk host (bulk + seed, worker off — [config/registry-crawl.toml](config/registry-crawl.toml); disable the rest):
 
 ```toml
 [registry-crawl.bulk]
@@ -97,7 +118,7 @@ enabled = false
 # … disable geoip.*, peeringdb, aspop, geonames, rpki.ingest, fdns.*, rdns.*
 ```
 
-RDAP worker host (bulk off; a second host can reuse the same file to scale the queue):
+RDAP worker host (same file with `[registry-crawl.worker]` `enabled = true`; bulk off; a second host can reuse that file to scale the queue):
 
 ```toml
 [registry-crawl.worker]
@@ -113,8 +134,11 @@ enabled = false
 ```
 
 ```sh
-opr run --config /etc/opr/whois.toml
-opr run --config /etc/opr/rdap.toml
+# worker off
+opr run --config config/registry-crawl.toml
+
+# [registry-crawl.worker] enabled = true
+opr run --config config/registry-crawl.toml
 ```
 
 ## Runtime Local dependencies
@@ -132,7 +156,7 @@ opr run --config /etc/opr/rdap.toml
 
 Commits are signed and show as verified on GitHub. Release binaries are built with GoReleaser for deterministic, reproducible builds, published with SHA-256 checksums, and signed with the project release key. There is no auto-update mechanism.
 
-Dependencies go through normal Go module hygiene (`go.sum` and CI). Secrets stay in the environment (`OPR_DSN`, `OPR_CLICKHOUSE_PASSWORD`, `OPR_PEERINGDB_APIKEY`), not in TOML.
+Dependencies go through normal Go module hygiene (`go.sum` and CI). Secrets stay in the environment (`OPR_POSTGRES_DB`, `OPR_CLICKHOUSE_PASSWORD`, `OPR_PEERINGDB_APIKEY`), not in TOML.
 
 opr contacts the public data sources you configure (RIR FTPs, RDAP, PeeringDB, Common Crawl, DNS) and any local Postgres, ClickHouse, Unbound, or Routinator you point it at. It has no telemetry or analytics remote reporting.
 

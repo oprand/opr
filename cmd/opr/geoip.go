@@ -110,7 +110,7 @@ func runGeoIPCrawlGeofeeds(c *cli.Context) error {
 	}
 	logger = logger.Named("opr.geoip.crawl-geofeeds")
 
-	dsn := c.String("dsn")
+	dsn := c.String("postgres-db")
 	if err := postgres.RunMigrations(logger.Named("store"), dsn); err != nil {
 		return err
 	}
@@ -146,7 +146,7 @@ func runGeoIPPrune(c *cli.Context) error {
 	}
 	logger = logger.Named("opr.geoip.prune")
 
-	dsn := c.String("dsn")
+	dsn := c.String("postgres-db")
 	if err := postgres.RunMigrations(logger.Named("store"), dsn); err != nil {
 		return err
 	}

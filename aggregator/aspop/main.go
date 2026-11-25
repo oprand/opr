@@ -70,14 +70,14 @@ func NewAsPopAggregator(c *cli.Context) (*AsPopAggregator, error) {
 	}
 	logger = logger.Named("opr.aspop")
 
-	DSN := c.String("dsn")
+	DSN := c.String("postgres-db")
 	pgStore, err := postgres.New(logger.Named("opr.aspop.store"), DSN)
 	if err != nil {
 		return nil, err
 	}
 
 	// Check the database is at last schema version, upgrade if necessary
-	err = postgres.RunMigrations(logger.Named("store"), c.String("dsn"))
+	err = postgres.RunMigrations(logger.Named("store"), c.String("postgres-db"))
 	if err != nil {
 		return nil, err
 	}

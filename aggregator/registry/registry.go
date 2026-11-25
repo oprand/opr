@@ -49,11 +49,11 @@ func NewRegistryAggregator(c *cli.Context) (*RegistryAggregator, error) {
 	logger = logger.Named("opr.registry")
 
 	// Check the database is at last schema version, upgrade if necessary
-	err = postgres.RunMigrations(logger.Named("store"), c.String("dsn"))
+	err = postgres.RunMigrations(logger.Named("store"), c.String("postgres-db"))
 	if err != nil {
 		return nil, err
 	}
-	pgStore, err := postgres.New(logger.Named("store"), c.String("dsn"))
+	pgStore, err := postgres.New(logger.Named("store"), c.String("postgres-db"))
 	if err != nil {
 		return nil, err
 	}

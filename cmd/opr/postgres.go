@@ -17,7 +17,7 @@ func postgresCommand() *cli.Command {
 		Usage:    "Management command for the Postgres schema (opr_migrations). Other commands still migrate on startup.",
 		Description: `Touches only the Postgres schema bookkeeping table opr_migrations. It does not ingest.
 
-Use migrate/version to apply or inspect without starting an ingest. Requires global --dsn.`,
+Use migrate/version to apply or inspect without starting an ingest. Requires global --postgres-db.`,
 		Subcommands: []*cli.Command{
 			{
 				Name:   "migrate",
@@ -39,7 +39,7 @@ func runPostgresMigrate(c *cli.Context) error {
 		return err
 	}
 	logger = logger.Named("opr.postgres.migrate")
-	return postgres.RunMigrations(logger, c.String("dsn"))
+	return postgres.RunMigrations(logger, c.String("postgres-db"))
 }
 
 func runPostgresVersion(c *cli.Context) error {
@@ -49,7 +49,7 @@ func runPostgresVersion(c *cli.Context) error {
 	}
 	logger = logger.Named("opr.postgres.version")
 
-	version, dirty, err := postgres.SchemaVersion(c.Context, c.String("dsn"))
+	version, dirty, err := postgres.SchemaVersion(c.Context, c.String("postgres-db"))
 	if err != nil {
 		return err
 	}

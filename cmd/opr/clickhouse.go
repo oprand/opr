@@ -24,7 +24,7 @@ func clickhouseCommand() *cli.Command {
 
 Unlike Postgres migrations (every command on startup), these are explicit: no transactional DDL, and reshaping a large MergeTree is maintenance. fdns ingest-cc and fdns seed-queue only assert the version and tell you to run migrate.
 
-When: before first ingest-cc / seed-queue, and after upgrading this binary. No --dsn.`,
+When: before first ingest-cc / seed-queue, and after upgrading this binary. No --postgres-db.`,
 		Subcommands: []*cli.Command{
 			{
 				Name:   "migrate",
@@ -52,8 +52,8 @@ func clickhouseFlags() []cli.Flag {
 			EnvVars: []string{opconfig.EnvClickHouseURL},
 		},
 		&cli.StringFlag{
-			Name:  "clickhouse-database",
-			Usage: "ClickHouse database holding fdns_cc_host",
+			Name:  "clickhouse-db",
+			Usage: "ClickHouse database name only (default opr), not a URL. Holds fdns_cc_host",
 			Value: clickhouse.DefaultDatabase,
 		},
 		&cli.StringFlag{
@@ -77,7 +77,7 @@ func clickhouseFlags() []cli.Flag {
 func clickhouseClientFromCLI(c *cli.Context) *clickhouse.Client {
 	return clickhouse.New(
 		c.String("clickhouse-url"),
-		c.String("clickhouse-database"),
+		c.String("clickhouse-db"),
 		c.String("clickhouse-user"),
 		c.String("clickhouse-password"),
 		c.Duration("clickhouse-timeout"),

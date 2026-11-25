@@ -39,7 +39,7 @@ func runPeeringDBStatus(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	st, err := postgres.New(logger.Named("store"), c.String("dsn"))
+	st, err := postgres.New(logger.Named("store"), c.String("postgres-db"))
 	if err != nil {
 		return err
 	}

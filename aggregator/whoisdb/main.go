@@ -102,9 +102,9 @@ func NewWhoisDBAggregator(c *cli.Context) (*WhoisDBAggregator, error) {
 
 	logger = logger.Named("whoisdb")
 
-	DSN := c.String("dsn")
+	DSN := c.String("postgres-db")
 	if !strings.HasPrefix(DSN, "postgresql://") {
-		return nil, fmt.Errorf("--dsn value must start with `postgresql://`")
+		return nil, fmt.Errorf("--postgres-db value must start with `postgresql://`")
 	}
 	pgStore, err := postgres.New(logger.Named("store"), DSN)
 	if err != nil {

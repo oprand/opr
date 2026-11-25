@@ -212,6 +212,7 @@ func TestSecretKeysAreErrors(t *testing.T) {
 	t.Parallel()
 	cases := map[string]string{
 		"dsn = \"postgresql://x\"\n":                                                    EnvDSN,
+		"postgres-db = \"postgresql://x\"\n":                                            EnvDSN,
 		"[clickhouse]\npassword = \"x\"\n":                                              EnvClickHousePassword,
 		"[clickhouse]\nclickhouse-password = \"x\"\n":                                   EnvClickHousePassword,
 		"[peeringdb]\napikey = \"x\"\n":                                                 EnvPeeringDBAPIKey,
@@ -423,6 +424,57 @@ func TestLoadExampleFile(t *testing.T) {
 	}
 	if len(cfg.RegistryCrawl.Seed.OnlyRegistries) != 0 {
 		t.Fatalf("example seed only-registries=%v", cfg.RegistryCrawl.Seed.OnlyRegistries)
+	}
+}
+
+func TestLoadSampleConfigs(t *testing.T) {
+	t.Parallel()
+	jobs := func(c *Config) map[string]bool {
+		return map[string]bool{
+			"registry-crawl.worker": c.RegistryCrawl.Worker.Enabled,
+			"registry-crawl.seed":   c.RegistryCrawl.Seed.Enabled,
+			"registry-crawl.bulk":   c.RegistryCrawl.Bulk.Enabled,
+			"geonames":              c.GeoNames.Enabled,
+			"peeringdb":             c.PeeringDB.Enabled,
+			"aspop":                 c.ASPop.Enabled,
+			"geoip.lacnic":          c.GeoIP.Lacnic.Enabled,
+			"geoip.ipmap":           c.GeoIP.IPMap.Enabled,
+			"geoip.anycast":         c.GeoIP.Anycast.Enabled,
+			"geoip.crawl-geofeeds":  c.GeoIP.CrawlGeofeeds.Enabled,
+			"rpki.ingest":           c.RPKI.Ingest.Enabled,
+			"fdns.ingest-lists":     c.FDNS.IngestLists.Enabled,
+			"fdns.resolve":          c.FDNS.Resolve.Enabled,
+			"fdns.ingest-cc":        c.FDNS.IngestCC.Enabled,
+			"fdns.seed-queue":       c.FDNS.SeedQueue.Enabled,
+			"rdns.ingest":           c.RDNS.Ingest.Enabled,
+			"rdns.crawl-ptr":        c.RDNS.CrawlPTR.Enabled,
+		}
+	}
+	samples := map[string][]string{
+		"aspop-peeringdb.toml": {"aspop", "peeringdb"},
+		"geoip-geonames.toml":  {"geoip.lacnic", "geoip.ipmap", "geoip.anycast", "geonames"},
+		"registry-crawl.toml":  {"registry-crawl.seed", "registry-crawl.bulk"},
+	}
+	for file, on := range samples {
+		cfg, err := Load(filepath.Join("..", "..", "examples", file))
+		if err != nil {
+			t.Fatalf("%s: %v", file, err)
+		}
+		want := map[string]bool{}
+		for _, name := range on {
+			want[name] = true
+		}
+		for name, enabled := range jobs(cfg) {
+			if enabled != want[name] {
+				t.Errorf("%s: %s enabled=%v, want %v", file, name, enabled, want[name])
+			}
+		}
+		if cfg.RegistryCrawl.Worker.Ipnet {
+			t.Errorf("%s: registry-crawl.worker.ipnet must be false so the RDAP queue stays off", file)
+		}
+		if !cfg.AnyEnabled() {
+			t.Errorf("%s: AnyEnabled must be true", file)
+		}
 	}
 }
 

@@ -46,7 +46,7 @@ func runRPKIIngest(c *cli.Context) error {
 	}
 	logger = logger.Named("opr.rpki.ingest")
 
-	dsn := c.String("dsn")
+	dsn := c.String("postgres-db")
 	if err := postgres.RunMigrations(logger.Named("store"), dsn); err != nil {
 		return err
 	}

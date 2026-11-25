@@ -51,7 +51,7 @@ make resetlocaldb
 That removes the Postgres and ClickHouse containers and deletes only the named volumes `opr_postgres` and `opr_clickhouse`. `unbound-cache` and `rpki-cache` are kept. The next database start is empty. Run the migrations again:
 
 ```sh
-opr --dsn 'postgresql://opr:opr@127.0.0.1:5432/opr?sslmode=disable' postgres migrate
+opr --postgres-db 'postgresql://opr:opr@127.0.0.1:5432/opr?sslmode=disable' postgres migrate
 opr clickhouse migrate --clickhouse-password opr
 ```
 

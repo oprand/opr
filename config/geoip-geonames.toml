@@ -1,0 +1,72 @@
+# GeoIP dumps and GeoNames.
+#
+# opr run --config examples/geoip-geonames.toml
+#
+# Secrets stay in the environment. Postgres only:
+#   OPR_POSTGRES_DB  Postgres connection string (required for `opr run`)
+#
+# Omitted keys keep the one-shot defaults. Omitted `enabled` means true, so
+# every other job is listed with enabled = false. Otherwise `opr run` would
+# start the whois dumps and fdns.ingest-cc.
+
+[geoip.lacnic]
+enabled = true
+interval = "24h"
+
+[geoip.ipmap]
+enabled = true
+interval = "24h"
+force = false               # true ignores the stored IPmap ETag
+
+[geoip.anycast]
+enabled = true
+interval = "24h"
+force = false               # true ignores the stored anycast ETag
+
+[geonames]
+enabled = true
+interval = "24h"
+
+[geoip.crawl-geofeeds]
+# Crawls operator geofeed URLs continuously. Separate from the lacnic,
+# ipmap, and anycast dumps above.
+enabled = false
+
+# Every other job stays off.
+
+[registry-crawl.worker]
+enabled = false
+ipnet = false               # ipnet alone starts the RDAP queue
+
+[registry-crawl.seed]
+enabled = false
+
+[registry-crawl.bulk]
+enabled = false
+
+[peeringdb]
+enabled = false
+
+[aspop]
+enabled = false
+
+[rpki.ingest]
+enabled = false
+
+[fdns.ingest-lists]
+enabled = false
+
+[fdns.resolve]
+enabled = false
+
+[fdns.ingest-cc]
+enabled = false
+
+[fdns.seed-queue]
+enabled = false
+
+[rdns.ingest]
+enabled = false
+
+[rdns.crawl-ptr]
+enabled = false

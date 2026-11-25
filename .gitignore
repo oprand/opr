@@ -3,9 +3,12 @@ bin/
 *.log
 logs/
 
-# Ignore eventual prod config files, but not the example config file.
+# Ignore eventual prod config files, but not the example config files.
 *.toml
 !opr.example.toml
+!config/aspop-peeringdb.toml
+!config/geoip-geonames.toml
+!config/registry-crawl.toml
 
 # Ignore env var
 .env

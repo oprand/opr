@@ -1,7 +1,7 @@
 // Package opconfig loads the TOML file behind `opr run`.
 //
 // `opr run` takes exactly one flag, --config. The file holds every job
-// setting; secrets (OPR_DSN, OPR_CLICKHOUSE_PASSWORD, OPR_PEERINGDB_APIKEY)
+// setting; secrets (OPR_POSTGRES_DB, OPR_CLICKHOUSE_PASSWORD, OPR_PEERINGDB_APIKEY)
 // come from the environment only and are rejected when they appear in the
 // file. One-shot commands keep their own flags and never read this file.
 //
@@ -47,8 +47,8 @@ const (
 	// EnvConfig names the environment variable that sets the config path
 	// when --config is not passed.
 	EnvConfig = "OPR_CONFIG"
-	// EnvDSN is the only way the daemon learns the Postgres DSN.
-	EnvDSN = "OPR_DSN"
+	// EnvDSN is the only way the daemon learns the Postgres connection string.
+	EnvDSN = "OPR_POSTGRES_DB"
 	// EnvClickHouseURL overrides [clickhouse].url for the daemon when set.
 	// One-shot --clickhouse-url reads the same variable. The password stays
 	// EnvClickHousePassword.
@@ -84,8 +84,10 @@ const (
 )
 
 // secretKeys are rejected anywhere in the file, whatever the table.
+// "dsn" and "postgres-db" are the same secret: the Postgres connection string.
 var secretKeys = map[string]string{
 	"dsn":                 EnvDSN,
+	"postgres-db":         EnvDSN,
 	"password":            EnvClickHousePassword,
 	"apikey":              EnvPeeringDBAPIKey,
 	"clickhouse-password": EnvClickHousePassword,
@@ -526,8 +528,8 @@ func Parse(data []byte) (*Config, error) {
 	return cfg, nil
 }
 
-// rejectSecretKeys walks the raw document and refuses dsn / password /
-// apikey / clickhouse-password wherever they appear.
+// rejectSecretKeys walks the raw document and refuses dsn / postgres-db /
+// password / apikey / clickhouse-password wherever they appear.
 func rejectSecretKeys(data []byte) error {
 	var raw map[string]any
 	if err := toml.Unmarshal(data, &raw); err != nil {

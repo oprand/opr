@@ -69,11 +69,11 @@ func NewGeoNames(c *cli.Context) (*GeoNames, error) {
 	}
 	logger = logger.Named("opr.geonames")
 
-	st, err := postgres.New(logger, c.String("dsn"))
+	st, err := postgres.New(logger, c.String("postgres-db"))
 	if err != nil {
 		return nil, err
 	}
-	err = postgres.RunMigrations(logger.Named("store"), c.String("dsn"))
+	err = postgres.RunMigrations(logger.Named("store"), c.String("postgres-db"))
 	if err != nil {
 		return nil, err
 	}
