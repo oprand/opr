@@ -1,9 +1,10 @@
 # AS population and PeeringDB.
 #
-# opr run --config examples/aspop-peeringdb.toml
+# opr run --config config/aspop-peeringdb.toml
 #
 # Secrets stay in the environment. Postgres only:
-#   OPR_POSTGRES_DB       Postgres connection string (required for `opr run`)
+#   OPR_POSTGRES_DB       Overrides the default Postgres connection string
+#                         postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable
 #   OPR_PEERINGDB_APIKEY  PeeringDB API key (optional; the public API works without it)
 #
 # Omitted keys keep the one-shot defaults. Omitted `enabled` means true, so

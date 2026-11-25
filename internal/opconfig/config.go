@@ -3,7 +3,9 @@
 // `opr run` takes exactly one flag, --config. The file holds every job
 // setting; secrets (OPR_POSTGRES_DB, OPR_CLICKHOUSE_PASSWORD, OPR_PEERINGDB_APIKEY)
 // come from the environment only and are rejected when they appear in the
-// file. One-shot commands keep their own flags and never read this file.
+// file. When OPR_POSTGRES_DB is unset, Postgres uses DefaultDSN. One-shot
+// commands keep their own flags and never read this file; an empty
+// --postgres-db falls back to OPR_POSTGRES_DB, then the same default.
 //
 // Omitted keys use the same defaults as the one-shot flags (the exported
 // Default* constants from the aggregator packages). Every job table has
@@ -47,8 +49,12 @@ const (
 	// EnvConfig names the environment variable that sets the config path
 	// when --config is not passed.
 	EnvConfig = "OPR_CONFIG"
-	// EnvDSN is the only way the daemon learns the Postgres connection string.
+	// EnvDSN overrides DefaultDSN for `opr run` and for one-shots when
+	// --postgres-db is empty. The config file cannot set it.
 	EnvDSN = "OPR_POSTGRES_DB"
+	// DefaultDSN is the local compose Postgres URL used when --postgres-db
+	// and EnvDSN are both empty. The scheme is postgres, not postgresql.
+	DefaultDSN = "postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable"
 	// EnvClickHouseURL overrides [clickhouse].url for the daemon when set.
 	// One-shot --clickhouse-url reads the same variable. The password stays
 	// EnvClickHousePassword.
@@ -82,6 +88,16 @@ const (
 	DefaultRDAPLease            = 2 * time.Minute
 	DefaultRDAPBatch            = 1
 )
+
+// PostgresDSN returns OPR_POSTGRES_DB when it is set to a non-empty value,
+// otherwise DefaultDSN. An explicit --postgres-db flag is applied by the
+// CLI before this is consulted; this function does not look at flags.
+func PostgresDSN() string {
+	if env := strings.TrimSpace(os.Getenv(EnvDSN)); env != "" {
+		return env
+	}
+	return DefaultDSN
+}
 
 // secretKeys are rejected anywhere in the file, whatever the table.
 // "dsn" and "postgres-db" are the same secret: the Postgres connection string.
@@ -495,7 +511,7 @@ func Load(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
-			return nil, fmt.Errorf("config file %s does not exist; copy opr.example.toml there or pass --config / set %s", path, EnvConfig)
+			return nil, fmt.Errorf("config file %s does not exist; copy config/opr.example.toml there or pass --config / set %s", path, EnvConfig)
 		}
 		return nil, fmt.Errorf("read config %s: %w", path, err)
 	}

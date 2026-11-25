@@ -48,6 +48,43 @@ func TestWithMigrationsTableAppendsBookkeepingParam(t *testing.T) {
 	}
 }
 
+func TestWithMigrationsTableAcceptsPostgresScheme(t *testing.T) {
+	t.Parallel()
+	in := "postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable"
+	got, err := withMigrationsTable(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	u, err := url.Parse(got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if u.Scheme != "postgres" {
+		t.Fatalf("scheme=%q, want postgres", u.Scheme)
+	}
+	if u.Query().Get("sslmode") != "disable" || u.Query().Get("x-migrations-table") != "opr_migrations" {
+		t.Fatalf("query=%s", u.RawQuery)
+	}
+
+	connectDSN, table, err := schemaVersionTarget(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if table != "opr_migrations" {
+		t.Fatalf("table=%q", table)
+	}
+	u, err = url.Parse(connectDSN)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if u.Scheme != "postgres" {
+		t.Fatalf("connect scheme=%q, want postgres", u.Scheme)
+	}
+	if u.Query().Get("sslmode") != "disable" {
+		t.Fatalf("sslmode=%q", u.Query().Get("sslmode"))
+	}
+}
+
 func TestLatestVersionMatchesEmbeddedMigrations(t *testing.T) {
 	t.Parallel()
 	if got := LatestVersion(); got != 1 {

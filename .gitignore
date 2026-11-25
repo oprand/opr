@@ -5,7 +5,7 @@ logs/
 
 # Ignore eventual prod config files, but not the example config files.
 *.toml
-!opr.example.toml
+!config/opr.example.toml
 !config/aspop-peeringdb.toml
 !config/geoip-geonames.toml
 !config/registry-crawl.toml

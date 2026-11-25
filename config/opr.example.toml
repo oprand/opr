@@ -4,7 +4,8 @@
 # or set OPR_CONFIG=PATH). `opr run` takes no other flag.
 #
 # OPR_POSTGRES_DB, OPR_CLICKHOUSE_PASSWORD, and OPR_PEERINGDB_APIKEY stay environment-only:
-#   OPR_POSTGRES_DB          Postgres connection string (required for `opr run`)
+#   OPR_POSTGRES_DB          Overrides the default Postgres connection string
+#                            postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable
 #   OPR_CLICKHOUSE_PASSWORD  ClickHouse password (fdns.ingest-cc, fdns.seed-queue)
 #   OPR_PEERINGDB_APIKEY     PeeringDB API key (optional private overlay)
 # A key named dsn, postgres-db, password, apikey, or clickhouse-password anywhere

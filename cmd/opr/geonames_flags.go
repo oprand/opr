@@ -19,7 +19,7 @@ func geonamesFlagsCommand() *cli.Command {
 		Usage: "Look up country_legal_flag rows (GDPR-like, OFAC, Eyes, NATO, AUKUS). Remap applies (UK→GB). --apply seeds rows. Needs Postgres.",
 		Description: `Read-only lookup of country_legal_flag for one country (and optional --region). Codes go through country_code_remap (UK→GB, EL→GR); a live ISO code is never rewritten (CV stays Cabo Verde).
 
-Requires: Postgres (--postgres-db or OPR_POSTGRES_DB). No downloads.
+Requires: Postgres (--postgres-db, else OPR_POSTGRES_DB, else postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable). No downloads.
 When: inspect legal/regime flags after geonames ingest. --apply writes the curated seed (idempotent). --check lists seeded ISOs missing from country_info.`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{

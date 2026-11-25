@@ -52,7 +52,9 @@ const (
 )
 
 // Daemon is `opr run`: one goroutine per enabled job from opr.config.toml.
-// Secrets come from the environment; nothing here reads --postgres-db.
+// Secrets come from the environment. Postgres falls back to
+// opconfig.DefaultDSN when OPR_POSTGRES_DB is unset. The DSN is never
+// taken from --postgres-db.
 type Daemon struct {
 	logger *zap.Logger
 	cfg    *opconfig.Config
@@ -63,15 +65,16 @@ type Daemon struct {
 	pdbAPIKey string
 }
 
-// runDaemon is the `run` Action. Order matters: resolve and load the
-// config, then require OPR_POSTGRES_DB, then migrate once, then start loops.
-// Nothing connects anywhere before OPR_POSTGRES_DB is checked.
+// runDaemon is the `run` Action. Order matters: reject --postgres-db,
+// resolve and load the config, then resolve the DSN (OPR_POSTGRES_DB or
+// the local default), then migrate once, then start loops. Nothing
+// connects anywhere before that DSN is chosen.
 func runDaemon(c *cli.Context) error {
 	if c.Args().Present() {
 		return fmt.Errorf("opr run takes no arguments, got %q", c.Args().First())
 	}
 	if strings.TrimSpace(c.String("postgres-db")) != "" {
-		return fmt.Errorf("opr run does not accept --postgres-db; set the %s environment variable", opconfig.EnvDSN)
+		return fmt.Errorf("opr run does not accept --postgres-db; set the %s environment variable to override the default", opconfig.EnvDSN)
 	}
 
 	path, err := opconfig.ResolvePath(c.String("config"))
@@ -83,10 +86,7 @@ func runDaemon(c *cli.Context) error {
 		return err
 	}
 
-	dsn := strings.TrimSpace(os.Getenv(opconfig.EnvDSN))
-	if dsn == "" {
-		return fmt.Errorf("opr run requires the %s environment variable (Postgres connection string)", opconfig.EnvDSN)
-	}
+	dsn := opconfig.PostgresDSN()
 
 	logger, err := oplog.NewFromCli(c)
 	if err != nil {

@@ -1,9 +1,10 @@
 # GeoIP dumps and GeoNames.
 #
-# opr run --config examples/geoip-geonames.toml
+# opr run --config config/geoip-geonames.toml
 #
 # Secrets stay in the environment. Postgres only:
-#   OPR_POSTGRES_DB  Postgres connection string (required for `opr run`)
+#   OPR_POSTGRES_DB  Overrides the default Postgres connection string
+#                    postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable
 #
 # Omitted keys keep the one-shot defaults. Omitted `enabled` means true, so
 # every other job is listed with enabled = false. Otherwise `opr run` would

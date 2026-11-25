@@ -17,7 +17,7 @@ func postgresCommand() *cli.Command {
 		Usage:    "Management command for the Postgres schema (opr_migrations). Other commands still migrate on startup.",
 		Description: `Touches only the Postgres schema bookkeeping table opr_migrations. It does not ingest.
 
-Use migrate/version to apply or inspect without starting an ingest. Requires global --postgres-db.`,
+Use migrate/version to apply or inspect without starting an ingest. Postgres is --postgres-db, else OPR_POSTGRES_DB, else postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable.`,
 		Subcommands: []*cli.Command{
 			{
 				Name:   "migrate",

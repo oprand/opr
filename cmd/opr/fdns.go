@@ -22,7 +22,7 @@ func fdnsCommand() *cli.Command {
 		Usage:    "Popular-hostname ingest and A/AAAA resolve into fdns_host_name / fdns_host_ip. Every subcommand but status also runs under opr run ([fdns.*]).",
 		Description: `Pick a subcommand. Lists and seed-queue fill fdns_resolve_queue; resolve drains it; ingest-cc loads Common Crawl Host Index into ClickHouse fdns_cc_host (run opr clickhouse migrate first).
 
-Needs: Postgres (--postgres-db) except ingest-cc (optional, ETag metadata only). seed-queue and ingest-cc also need ClickHouse flags.`,
+Needs: Postgres (--postgres-db, else OPR_POSTGRES_DB, else postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable) except ingest-cc (optional, ETag metadata only when --postgres-db or OPR_POSTGRES_DB is set). seed-queue and ingest-cc also need ClickHouse flags.`,
 		Subcommands: []*cli.Command{
 			{
 				Name:  "ingest-lists",
@@ -114,7 +114,7 @@ When: after names are enqueued; continuous under opr run. NXDOMAIN/NODATA stamp 
 				Usage: "Filter ClickHouse fdns_cc_host into Postgres fdns_host_name + fdns_resolve_queue. In opr run this is the periodic [fdns.seed-queue] job.",
 				Description: `Does: copy a filtered slice of ClickHouse fdns_cc_host into Postgres fdns_host_name (source=cc; NormalizeHostname for IDNA parity) and fdns_resolve_queue. ingest-cc does not write hostnames — this subcommand does.
 
-Needs: Postgres (--postgres-db) and ClickHouse. Run opr clickhouse migrate first (version assert only here).
+Needs: Postgres (--postgres-db, else OPR_POSTGRES_DB, else the local default) and ClickHouse. Run opr clickhouse migrate first (version assert only here).
 
 When: after ingest-cc. --order key pages with fdns:cc-seed-cursor; --order rank is top-N. --queue-high-water skips/caps when approximate fdns_resolve_queue size (pg_class.reltuples) is already high.`,
 				Flags: append([]cli.Flag{

@@ -162,7 +162,7 @@ func newCLIApp() *cli.App {
 	cliapp.Flags = []cli.Flag{
 		&cli.StringFlag{
 			Name:  "postgres-db",
-			Usage: "PostgreSQL connection string. Eg: `postgresql://usr:pwd@ip:port/dbname?opt=val`. Required for every command except `run` (reads OPR_POSTGRES_DB only), `clickhouse`, `fdns ingest-cc` (ETag metadata only, and only when set), and help. One-shots fall back to OPR_POSTGRES_DB when this flag is empty.",
+			Usage: "PostgreSQL connection string. Default `postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable` (local compose). An explicit value overrides OPR_POSTGRES_DB, which overrides this default. run does not accept this flag and uses OPR_POSTGRES_DB or the same default. Unused by clickhouse. Optional for fdns ingest-cc (ETag metadata, only when set). Not needed for help.",
 			// Not Required: urfave checkRequiredFlags runs on the root command
 			// before it dispatches a subcommand, so a required global flag
 			// blocks ClickHouse-only commands. requirePostgresDSN enforces it.
@@ -269,12 +269,12 @@ func newCLIApp() *cli.App {
 		Name:     "run",
 		Aliases:  []string{"r"},
 		Category: commandCategoryData,
-		Usage:    "Run every enabled ingest job from opr.config.toml until SIGINT/SIGTERM. Only flag: --config. Secrets come from OPR_POSTGRES_DB, OPR_CLICKHOUSE_PASSWORD, OPR_PEERINGDB_APIKEY.",
+		Usage:    "Run every enabled ingest job from opr.config.toml until SIGINT/SIGTERM. Only flag: --config. Postgres defaults to the local compose URL; OPR_POSTGRES_DB overrides it. OPR_CLICKHOUSE_PASSWORD and OPR_PEERINGDB_APIKEY stay environment-only.",
 		Description: `Start one goroutine per job enabled in the TOML file and run until SIGINT or SIGTERM.
 
-Config path: --config, else OPR_CONFIG, else ~/.config/opr.config.toml. The file must exist; copy opr.example.toml there. Every job table has enabled (default true); omitted keys keep the one-shot flag defaults. Unknown keys are errors.
+Config path: --config, else OPR_CONFIG, else ~/.config/opr.config.toml. The file must exist; copy config/opr.example.toml there. Every job table has enabled (default true); omitted keys keep the one-shot flag defaults. Unknown keys are errors.
 
-Secrets are never read from the file: OPR_POSTGRES_DB (required), OPR_CLICKHOUSE_PASSWORD, OPR_PEERINGDB_APIKEY. --postgres-db is not accepted on run.
+Secrets are never read from the file. OPR_POSTGRES_DB overrides the default postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable. OPR_CLICKHOUSE_PASSWORD and OPR_PEERINGDB_APIKEY have no default. --postgres-db is not accepted on run.
 
 Jobs: rdap (autnum + ipnet queue workers), seed, whoisdb, geonames, peeringdb, aspop, geoip (lacnic, ipmap, anycast, geofeeds), rpki, fdns.ingest-lists, fdns.resolve, fdns.ingest-cc, fdns.seed-queue, rdns.ingest, rdns.crawl-ptr. Status boards, geonames flags, mark-ipnet-bulk, asnames, geoip prune, and the postgres/clickhouse schema commands stay one-shot.`,
 		Flags: []cli.Flag{
@@ -431,18 +431,20 @@ Jobs: rdap (autnum + ipnet queue workers), seed, whoisdb, geonames, peeringdb, a
 
 }
 
-// requirePostgresDSN enforces --postgres-db for commands that talk to Postgres.
+// requirePostgresDSN fills --postgres-db for commands that talk to Postgres.
 // urfave's unexported checkRequiredFlags runs on the root command before it
 // dispatches a subcommand, so a Required global flag would also reject
 // `opr clickhouse` and `opr fdns ingest-cc`. Help does not connect, so
-// `opr help` and `opr postgres --help` do not need --postgres-db. `postgres migrate`
-// and `postgres version` still do. Zero positional args is bare `opr`, which
-// shows the same app help after this hook returns. An empty arg list must
-// pass here or that path exits on a missing --postgres-db.
+// `opr help` and `opr postgres --help` do not need a DSN. Zero positional
+// args is bare `opr`, which shows the same app help after this hook returns.
 //
-// One-shots fall back to OPR_POSTGRES_DB when --postgres-db is empty. `run` is skipped
-// here entirely: it reads OPR_POSTGRES_DB itself and rejects --postgres-db, so the flag
-// is never confused with the environment (see runDaemon).
+// Precedence for one-shots: explicit --postgres-db, then OPR_POSTGRES_DB,
+// then opconfig.DefaultDSN. clickhouse and fdns ingest-cc stay empty when
+// both the flag and the env are empty (ingest-cc uses Postgres only when
+// one of those is set). `run` is skipped here entirely: it reads
+// OPR_POSTGRES_DB itself, falls back to the same default, and rejects
+// --postgres-db, so the flag is never confused with the environment
+// (see runDaemon).
 func requirePostgresDSN(c *cli.Context) error {
 	if !c.Args().Present() {
 		return nil
@@ -451,16 +453,16 @@ func requirePostgresDSN(c *cli.Context) error {
 	if isRunCommand(args) || helpRequested(args) {
 		return nil
 	}
-	if strings.TrimSpace(c.String("postgres-db")) == "" {
+	if strings.TrimSpace(c.String("postgres-db")) != "" {
+		return nil
+	}
+	if postgresDSNOptional(args) {
 		if env := strings.TrimSpace(os.Getenv(opconfig.EnvDSN)); env != "" {
 			return c.Set("postgres-db", env)
 		}
-		if postgresDSNOptional(args) {
-			return nil
-		}
-		return fmt.Errorf("Required flag %q not set", "postgres-db")
+		return nil
 	}
-	return nil
+	return c.Set("postgres-db", opconfig.PostgresDSN())
 }
 
 // isRunCommand is true when the first positional argument is the daemon
@@ -471,7 +473,7 @@ func isRunCommand(args []string) bool {
 
 // helpRequested is true for the help command and for --help / -h on any
 // command. A bare "h" counts only as the help alias in the first position,
-// so a later flag value of "h" still requires --postgres-db.
+// so a later flag value of "h" still resolves the Postgres DSN.
 func helpRequested(args []string) bool {
 	if len(args) > 0 && (args[0] == "help" || args[0] == "h") {
 		return true

@@ -397,7 +397,7 @@ func TestLoadMissingFileDoesNotCreateIt(t *testing.T) {
 
 func TestLoadExampleFile(t *testing.T) {
 	t.Parallel()
-	cfg, err := Load(filepath.Join("..", "..", "opr.example.toml"))
+	cfg, err := Load(filepath.Join("..", "..", "config", "opr.example.toml"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -456,7 +456,7 @@ func TestLoadSampleConfigs(t *testing.T) {
 		"registry-crawl.toml":  {"registry-crawl.seed", "registry-crawl.bulk"},
 	}
 	for file, on := range samples {
-		cfg, err := Load(filepath.Join("..", "..", "examples", file))
+		cfg, err := Load(filepath.Join("..", "..", "config", file))
 		if err != nil {
 			t.Fatalf("%s: %v", file, err)
 		}
@@ -519,6 +519,27 @@ func TestProxyParseErrorHidesSecret(t *testing.T) {
 	}
 	if !strings.Contains(msg, "index 0") {
 		t.Fatalf("error should name the index: %v", err)
+	}
+}
+
+func TestPostgresDSNDefaultAndOverride(t *testing.T) {
+	t.Setenv(EnvDSN, "")
+	if got := PostgresDSN(); got != DefaultDSN {
+		t.Fatalf("PostgresDSN()=%q, want default %q", got, DefaultDSN)
+	}
+	if DefaultDSN != "postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable" {
+		t.Fatalf("DefaultDSN=%q", DefaultDSN)
+	}
+
+	t.Setenv(EnvDSN, "  ")
+	if got := PostgresDSN(); got != DefaultDSN {
+		t.Fatalf("whitespace env PostgresDSN()=%q, want default", got)
+	}
+
+	const explicit = "postgresql://from-env/db"
+	t.Setenv(EnvDSN, explicit)
+	if got := PostgresDSN(); got != explicit {
+		t.Fatalf("PostgresDSN()=%q, want explicit %q", got, explicit)
 	}
 }
 

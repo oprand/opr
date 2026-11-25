@@ -1,8 +1,8 @@
-[![CI](https://github.com/oprand/opr/actions/workflows/test.yml/badge.svg)](https://github.com/oprand/opr/actions/workflows/test.yml) [![Go Reference](https://pkg.go.dev/badge/github.com/oprand/opr.svg)](https://pkg.go.dev/github.com/oprand/opr) [![License](https://img.shields.io/github/license/oprand/opr)](./LICENSE)
+![CI](https://github.com/oprand/opr/actions/workflows/test.yml/badge.svg) ![Go Reference](https://pkg.go.dev/badge/github.com/oprand/opr.svg) ![License](https://img.shields.io/github/license/oprand/opr)
 
 # `opr`: Internet Network Data Aggregator
 
-`opr` fetches, augments and stores continuously updated network data from various sources.
+`opr` fetches, enriches and stores continuously updated network data from various sources.
 
 Network data about these entities: Autonomous System Number (ASN), IP address, IP address prefix, domain name, DNS records, RPKI and Internet Exchange Points (IXP).
 
@@ -11,6 +11,128 @@ Its purpose is to provide data for a comprehensive and up-to-date view of the In
 It can run as a daemon, or as a one-shot command, for a subset of the ingests or all of them.
 
 The whole system can be setup using the Makefile at the root of the repository, dependencies are managed using docker compose.
+
+
+## Getting Started
+
+### 1. Install the `opr` command
+
+#### Install it as a Go binary:
+```sh
+go install github.com/oprand/opr/cmd/opr@latest
+```
+That writes `opr` to `$(go env GOPATH)/bin`. That directory has to be on your `PATH`.
+
+#### Or build it from source:
+
+```sh
+git clone https://github.com/oprand/opr.git && \
+cd opr && \
+make build
+```
+
+That writes `./bin/opr`.
+
+#### Or use the Dockerfile:
+
+```sh
+docker build -t opr .
+```
+
+That builds the `opr` image (Alpine image, entrypoint `/app/opr`). It does not start Postgres, ClickHouse, Unbound, or Routinator. Pass `--postgres-db` and the subcommand at `docker run` time.
+
+
+### 2. Start PostgreSQL and ClickHouse
+```sh
+make startdb 
+```
+That starts PostgreSQL and ClickHouse with the provided [docker compose configuration](docker-compose.yml).
+ClickHouse is optional, but recommended for the `fdns` command.
+
+### 3. Run the `opr` command
+
+The default Postgres connection string is the local compose database:
+
+`postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable`
+
+One-shot commands use it when `--postgres-db` is omitted. `opr run` uses it when `OPR_POSTGRES_DB` is unset. Pass `--postgres-db` or export `OPR_POSTGRES_DB` to use another database. `opr run` does not accept `--postgres-db`.
+
+#### Get ASN population data
+```sh
+opr --postgres-db postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable aspop
+```
+
+#### Get PeeringDB data
+```sh
+opr --postgres-db postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable peeringdb
+```
+
+#### Get RPKI data
+Use `make startroutinator` to start the Routinator dependency, then:
+```sh
+opr --postgres-db postgres://opr:opr@127.0.0.1:5432/opr?sslmode=disable rpki ingest 
+```
+
+#### Run multiple commands at once with the daemon mode
+
+```sh
+opr run --config config/opr.example.toml
+```
+
+The full [opr.example.toml](config/opr.example.toml) enables every ingest, turn off the ones you don't need.
+
+3 other example configs are:
+- [config/geoip-geonames.toml](config/geoip-geonames.toml) enables geoip and geonames.
+- [config/registry-crawl.toml](config/registry-crawl.toml) enables registry-crawl seed and bulk, with the worker (rdap crawler for ARIN and LACNIC) off.
+- [config/aspop-peeringdb.toml](config/aspop-peeringdb.toml) enables aspop and peeringdb.
+
+
+### Scale out with different configs
+
+Several `opr run --config …` processes can share the same `OPR_POSTGRES_DB`. Each TOML turns jobs on/off with `enabled` (default true). Start from a sample: [config/aspop-peeringdb.toml](config/aspop-peeringdb.toml), [config/geoip-geonames.toml](config/geoip-geonames.toml), or [config/registry-crawl.toml](config/registry-crawl.toml). Section names match CLI syntax (`[command]` or `[command.subcommand]`).
+
+**Bulk/periodic jobs** (registry-crawl.bulk, registry-crawl.seed, geoip.*, peeringdb, aspop, geonames, rpki.ingest, fdns.ingest-lists / ingest-cc / seed-queue, rdns.ingest): one host only each — two owners duplicate downloads/writes.
+
+**Queue jobs** (registry-crawl.worker, fdns.resolve, rdns.crawl-ptr, geoip.crawl-geofeeds): safe on multiple hosts (leases / `SKIP LOCKED`).
+
+Side deps only where needed (ClickHouse for cc/seed-queue, Routinator for rpki, Unbound for resolve). This is role split, not ASN-range sharding; `only-registries` can further narrow registry-crawl worker/seed.
+
+Registry bulk host (bulk + seed, worker off — [config/registry-crawl.toml](config/registry-crawl.toml); disable the rest):
+
+```toml
+[registry-crawl.bulk]
+enabled = true
+
+[registry-crawl.seed]
+enabled = true
+
+[registry-crawl.worker]
+enabled = false
+# … disable geoip.*, peeringdb, aspop, geonames, rpki.ingest, fdns.*, rdns.*
+```
+
+RDAP worker host (same file with `[registry-crawl.worker]` `enabled = true`; bulk off; a second host can reuse that file to scale the queue):
+
+```toml
+[registry-crawl.worker]
+enabled = true
+# ipnet = true  # if desired
+
+[registry-crawl.bulk]
+enabled = false
+
+[registry-crawl.seed]
+enabled = false
+# … disable the other bulk jobs
+```
+
+```sh
+# worker off
+opr run --config config/registry-crawl.toml
+
+# [registry-crawl.worker] enabled = true
+opr run --config config/registry-crawl.toml
+```
 
 ## Commands
 
@@ -60,86 +182,6 @@ The whole system can be setup using the Makefile at the root of the repository, 
   - Store: ClickHouse
 
 Run `bin/opr help` for the command list and `bin/opr <command> --help` for one command.
-
-## Getting Started
-
-```sh
-make startdb
-export OPR_POSTGRES_DB='postgresql://opr:opr@127.0.0.1:5432/opr?sslmode=disable'
-make build
-bin/opr --postgres-db "$OPR_POSTGRES_DB" aspop
-```
-
-Or the sample daemon:
-
-```sh
-bin/opr run --config config/aspop-peeringdb.toml
-```
-
-The full [opr.example.toml](opr.example.toml) enables every ingest, including multi-GB whois and a ClickHouse job that needs a Docker VM larger than 16 GB; use a sample file first.
-
-[config/geoip-geonames.toml](config/geoip-geonames.toml) enables geoip and geonames.
-
-[config/registry-crawl.toml](config/registry-crawl.toml) enables registry-crawl seed and bulk, with the worker off.
-
-## Build
-
-From this directory:
-
-```sh
-make build
-```
-
-That writes `bin/opr`. `make` with no target prints the Makefile help. `make test` runs `go test ./...`.
-
-`Dockerfile` builds only the CLI (Alpine image, entrypoint `/app/opr`). It does not start Postgres, ClickHouse, Unbound, or Routinator. Pass `--postgres-db` and the subcommand at `docker run` time.
-
-### Scale out with different configs
-
-Several `opr run --config …` processes can share the same `OPR_POSTGRES_DB`. Each TOML turns jobs on/off with `enabled` (default true). Start from a sample: [config/aspop-peeringdb.toml](config/aspop-peeringdb.toml), [config/geoip-geonames.toml](config/geoip-geonames.toml), or [config/registry-crawl.toml](config/registry-crawl.toml). Section names match CLI syntax (`[command]` or `[command.subcommand]`).
-
-**Bulk/periodic jobs** (registry-crawl.bulk, registry-crawl.seed, geoip.*, peeringdb, aspop, geonames, rpki.ingest, fdns.ingest-lists / ingest-cc / seed-queue, rdns.ingest): one host only each — two owners duplicate downloads/writes.
-
-**Queue jobs** (registry-crawl.worker, fdns.resolve, rdns.crawl-ptr, geoip.crawl-geofeeds): safe on multiple hosts (leases / `SKIP LOCKED`).
-
-Side deps only where needed (ClickHouse for cc/seed-queue, Routinator for rpki, Unbound for resolve). This is role split, not ASN-range sharding; `only-registries` can further narrow registry-crawl worker/seed.
-
-Registry bulk host (bulk + seed, worker off — [config/registry-crawl.toml](config/registry-crawl.toml); disable the rest):
-
-```toml
-[registry-crawl.bulk]
-enabled = true
-
-[registry-crawl.seed]
-enabled = true
-
-[registry-crawl.worker]
-enabled = false
-# … disable geoip.*, peeringdb, aspop, geonames, rpki.ingest, fdns.*, rdns.*
-```
-
-RDAP worker host (same file with `[registry-crawl.worker]` `enabled = true`; bulk off; a second host can reuse that file to scale the queue):
-
-```toml
-[registry-crawl.worker]
-enabled = true
-# ipnet = true  # if desired
-
-[registry-crawl.bulk]
-enabled = false
-
-[registry-crawl.seed]
-enabled = false
-# … disable the other bulk jobs
-```
-
-```sh
-# worker off
-opr run --config config/registry-crawl.toml
-
-# [registry-crawl.worker] enabled = true
-opr run --config config/registry-crawl.toml
-```
 
 ## Runtime Local dependencies
 
