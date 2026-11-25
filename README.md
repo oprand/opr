@@ -1,4 +1,4 @@
-[![CI](https://github.com/oprand/opr/actions/workflows/test.yml/badge.svg)](https://github.com/oprand/opr/actions/workflows/test.yml) [![Go Reference](https://pkg.go.dev/badge/github.com/oprand/opr.svg)](https://pkg.go.dev/github.com/oprand/opr) [![License](https://img.shields.io/github/license/oprand/opr)](LICENSE)
+[![CI](https://github.com/oprand/opr/actions/workflows/test.yml/badge.svg)](https://github.com/oprand/opr/actions/workflows/test.yml) [![Go Reference](https://pkg.go.dev/badge/github.com/oprand/opr.svg)](https://pkg.go.dev/github.com/oprand/opr) [![License](https://img.shields.io/github/license/oprand/opr)](./LICENSE)
 
 # `opr`: Internet Network Data Aggregator
 
@@ -64,7 +64,7 @@ Run `bin/opr help` for the command list and `bin/opr <command> --help` for one c
 ## Getting Started
 
 ```sh
-make localdb
+make startdb
 export OPR_POSTGRES_DB='postgresql://opr:opr@127.0.0.1:5432/opr?sslmode=disable'
 make build
 bin/opr --postgres-db "$OPR_POSTGRES_DB" aspop
@@ -145,12 +145,12 @@ opr run --config config/registry-crawl.toml
 
 | Service | Required for | How to run it |
 | --- | --- | --- |
-| Postgres | Every command except `clickhouse`, `fdns ingest-cc`, and help | `make localdb`, `make stoplocaldb`, `make resetlocaldb`. See [store/README.md](store/README.md). |
-| ClickHouse | `clickhouse`, `fdns ingest-cc`, `fdns seed-queue` | `make localdb`, `make stoplocaldb`, `make resetlocaldb`. See [store/README.md](store/README.md). |
-| Routinator | `rpki ingest` | `make localroutinator`, `make stoproutinator`, `make resetroutinator`. See [store/README.md](store/README.md). |
-| Unbound | Optional, preferred for `fdns resolve` | `make localunbound`, `make stopunbound`, `make resetunbound`. See [store/README.md](store/README.md). |
+| Postgres | Every command except `clickhouse`, `fdns ingest-cc`, and help | `make startdb`, `make stopdb`, `make resetdb`. See [store/README.md](store/README.md). |
+| ClickHouse | `clickhouse`, `fdns ingest-cc`, `fdns seed-queue` | `make startdb`, `make stopdb`, `make resetdb`. See [store/README.md](store/README.md). |
+| Routinator | `rpki ingest` | `make startroutinator`, `make stoproutinator`, `make resetroutinator`. See [store/README.md](store/README.md). |
+| Unbound | Optional, preferred for `fdns resolve` | `make startunbound`, `make stopunbound`, `make resetunbound`. See [store/README.md](store/README.md). |
 
-`make localdb` starts only Postgres and ClickHouse. Unbound (profile `dns`) and Routinator (profile `rpki`) stay stopped until their own targets. All four services are in `docker-compose.yml`.
+`make startdb` starts only Postgres and ClickHouse. Unbound (profile `dns`) and Routinator (profile `rpki`) stay stopped until their own targets. All four services are in `docker-compose.yml`.
 
 ## Security
 

@@ -1,10 +1,10 @@
 # Local Postgres and ClickHouse for opr.
-# Optional profiles are not started by `docker compose up -d` or `make localdb`:
-#   dns  — Unbound (`make localunbound`)
-#   rpki — Routinator (`make localroutinator`)
-# Start: make localdb
-# Stop:  make stoplocaldb   (postgres and clickhouse only; volumes kept)
-# Reset: make resetlocaldb  (deletes only opr_postgres and opr_clickhouse)
+# Optional profiles are not started by `docker compose up -d` or `make startdb`:
+#   dns  — Unbound (`make startunbound`)
+#   rpki — Routinator (`make startroutinator`)
+# Start: make startdb
+# Stop:  make stopdb   (postgres and clickhouse only; volumes kept)
+# Reset: make resetdb  (deletes only opr_postgres and opr_clickhouse)
 # Details: store/README.md
 
 services:
@@ -53,8 +53,8 @@ services:
     restart: unless-stopped
 
   # Local Unbound recursive resolver for opr fdns resolve.
-  # Profile dns: not started by `docker compose up -d` or `make localdb`.
-  # Start with: make localunbound
+  # Profile dns: not started by `docker compose up -d` or `make startdb`.
+  # Start with: make startunbound
   # DNS: 127.0.0.1:${UNBOUND_HOST_PORT} UDP+TCP (loopback only).
   # make defaults UNBOUND_HOST_PORT to 5353 on Darwin (typical :53 conflict)
   # and 53 elsewhere. UNBOUND_HOST_PORT=53 still publishes :53 if you want it.
@@ -93,8 +93,8 @@ services:
     restart: unless-stopped
 
   # Local Routinator for opr RPKI/ASPA lookups.
-  # Profile rpki: not started by `docker compose up -d` or `make localdb`.
-  # Start with: make localroutinator
+  # Profile rpki: not started by `docker compose up -d` or `make startdb`.
+  # Start with: make startroutinator
   # HTTP: 127.0.0.1:8323  RTR: 127.0.0.1:3323
   # Pin: nlnetlabs/routinator:v0.15.2 (--enable-aspa is a 0.15 global flag)
   # First start fills the RPKI cache (a few GB) before /jsonext returns.

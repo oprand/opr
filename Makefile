@@ -33,7 +33,7 @@ stopdb: ## Stop local Postgres and ClickHouse only (running Unbound or Routinato
 resetdb: ## DESTRUCTIVE: remove Postgres and ClickHouse and delete only volumes opr_postgres and opr_clickhouse (database data lost; unbound-cache and rpki-cache are kept)
 	docker compose rm -fs postgres clickhouse
 	@project=$$(docker compose config --format json | awk -F'"' '/"name"/ { for (i = 1; i <= NF; i++) if ($$i == "name") { print $$(i+2); exit } }'); \
-	if [ -z "$$project" ]; then echo "resetlocaldb: could not read compose project name" >&2; exit 1; fi; \
+	if [ -z "$$project" ]; then echo "resetdb: could not read compose project name" >&2; exit 1; fi; \
 	for key in opr_postgres opr_clickhouse; do \
 		vol=$$(docker volume ls -q --filter "label=com.docker.compose.project=$$project" --filter "label=com.docker.compose.volume=$$key"); \
 		if [ -n "$$vol" ]; then docker volume rm $$vol; fi; \

@@ -102,7 +102,7 @@ only = []                   # empty = tranco, umbrella, crux
 [fdns.resolve]
 enabled = true              # continuous queue, not a sleep loop
 # Five public recursives. Copying this file must not point at a resolver
-# that is not running. On macOS, `make localunbound` publishes Unbound at
+# that is not running. On macOS, `make startunbound` publishes Unbound at
 # 127.0.0.1:5353; uncomment that line and comment the public set to use it.
 resolver = ["1.1.1.1", "8.8.8.8", "9.9.9.9", "208.67.222.222", "74.82.42.42"]
 # resolver = ["127.0.0.1:5353"]

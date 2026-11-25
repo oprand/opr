@@ -12,7 +12,7 @@ Postgres ships a single `0001_initial` baseline. `RunMigrations` applies it and 
 
 ## Local services
 
-Postgres, ClickHouse, Unbound, and Routinator all run from the repo-root `docker-compose.yml`. Postgres and ClickHouse have no profile. Unbound is profile `dns`. Routinator is profile `rpki`. `docker compose up -d` and `make localdb` start only the two databases.
+Postgres, ClickHouse, Unbound, and Routinator all run from the repo-root `docker-compose.yml`. Postgres and ClickHouse have no profile. Unbound is profile `dns`. Routinator is profile `rpki`. `docker compose up -d` and `make startdb` start only the two databases.
 
 `restart: unless-stopped` brings a container back when Docker itself starts. That applies to a database, Unbound, or Routinator only after that service has been started once.
 
@@ -27,7 +27,7 @@ The compose file uses named volumes rather than a folder on the host. Database w
 Start both databases. Volumes are created on first start and kept after that:
 
 ```sh
-make localdb
+make startdb
 ```
 
 `docker compose up -d` from the repo root does the same thing. It does not start Unbound or Routinator. Data is kept across later starts, stops, and reboots.
@@ -35,7 +35,7 @@ make localdb
 Stop them. Volumes and data are kept. A running Unbound or Routinator is left alone:
 
 ```sh
-make stoplocaldb
+make stopdb
 ```
 
 That runs `docker compose stop postgres clickhouse`. A bare `docker compose stop` would also stop profile services that are already running. Do not use that when you only want the databases down.
@@ -45,7 +45,7 @@ That runs `docker compose stop postgres clickhouse`. A bare `docker compose stop
 Reset, which deletes the database files and nothing else:
 
 ```sh
-make resetlocaldb
+make resetdb
 ```
 
 That removes the Postgres and ClickHouse containers and deletes only the named volumes `opr_postgres` and `opr_clickhouse`. `unbound-cache` and `rpki-cache` are kept. The next database start is empty. Run the migrations again:
