@@ -3,7 +3,8 @@
 .PHONY: build test help startdb stopdb resetdb startunbound stopunbound resetunbound startroutinator stoproutinator resetroutinator
 
 GITHASH := $(shell if [ -d .git ]; then git rev-parse HEAD; else echo dev; fi)
-LDFLAGS := -X github.com/oprand/opr/internal/version.GitCommitHash=$(GITHASH)
+VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+LDFLAGS := -X github.com/oprand/opr/internal/version.GitCommitHash=$(GITHASH) -X github.com/oprand/opr/internal/version.Version=$(VERSION)
 
 # Port 53 is usually taken on macOS. Other hosts publish 53.
 # Override on the command line: make startunbound UNBOUND_HOST_PORT=53

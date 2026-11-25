@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"runtime/debug"
 	"slices"
 	"strings"
 	"sync"
@@ -111,6 +112,20 @@ func applyHelpUsageTexts(cmds []*cli.Command, trail []string) {
 	}
 }
 
+// oprVersionCommand prints the same line as --version. urfave only
+// handles the flag; a bare `version` argument is otherwise a help topic.
+func oprVersionCommand() *cli.Command {
+	return &cli.Command{
+		Name:     "version",
+		Category: commandCategoryManagement,
+		Usage:    "Print the opr version",
+		Action: func(c *cli.Context) error {
+			cli.ShowVersion(c)
+			return nil
+		},
+	}
+}
+
 // oprHelpCommand is a local copy of urfave/cli's default help command.
 // The library command is unexported, has no category, and is appended at
 // Setup, so it prints outside DATA and MANAGEMENT. Registering this copy
@@ -152,11 +167,30 @@ func run() error {
 	return newCLIApp().Run(os.Args)
 }
 
+// cliVersion is the string urfave prints after `opr version` and `opr --version`.
+// A release build injects version.Version at compile time. A plain `go install`
+// of a module version leaves that at "dev" and embeds the version in build info.
+func cliVersion() string {
+	ver := version.Version
+	if ver == "" || ver == "dev" {
+		ver = "dev"
+		if info, ok := debug.ReadBuildInfo(); ok {
+			if mv := info.Main.Version; mv != "" && mv != "(devel)" {
+				ver = mv
+			}
+		}
+	}
+	if version.GitCommitHash != "" {
+		return ver + " - Commit: " + version.GitCommitHash
+	}
+	return ver
+}
+
 func newCLIApp() *cli.App {
 	cliapp := cli.NewApp()
 	cliapp.Name = "opr"
 	cliapp.Usage = "opr network data aggregator"
-	cliapp.Version = fmt.Sprintf("0.0.1 - Commit: %s", version.GitCommitHash)
+	cliapp.Version = cliVersion()
 	cliapp.EnableBashCompletion = true
 
 	cliapp.Flags = []cli.Flag{
@@ -420,6 +454,7 @@ Jobs: rdap (autnum + ipnet queue workers), seed, whoisdb, geonames, peeringdb, a
 		fdnsCommand(),
 		clickhouseCommand(),
 		postgresCommand(),
+		oprVersionCommand(),
 		oprHelpCommand(),
 		geoIPCommand(),
 		&geonamesCommand,
@@ -450,7 +485,7 @@ func requirePostgresDSN(c *cli.Context) error {
 		return nil
 	}
 	args := c.Args().Slice()
-	if isRunCommand(args) || helpRequested(args) {
+	if isRunCommand(args) || helpRequested(args) || isVersionCommand(args) {
 		return nil
 	}
 	if strings.TrimSpace(c.String("postgres-db")) != "" {
@@ -469,6 +504,12 @@ func requirePostgresDSN(c *cli.Context) error {
 // command or its alias.
 func isRunCommand(args []string) bool {
 	return len(args) > 0 && (args[0] == "run" || args[0] == "r")
+}
+
+// isVersionCommand is true for `opr version`. It only prints the build
+// version and does not connect to Postgres.
+func isVersionCommand(args []string) bool {
+	return len(args) > 0 && args[0] == "version"
 }
 
 // helpRequested is true for the help command and for --help / -h on any

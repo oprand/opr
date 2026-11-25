@@ -1,3 +1,6 @@
 package version
 
-var GitCommitHash string
+var (
+	Version       = "dev"
+	GitCommitHash string
+)

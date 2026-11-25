@@ -19,7 +19,7 @@ builds:
     flags:
       - -trimpath
     ldflags:
-      - -s -w -buildid= -X github.com/oprand/opr/internal/version.GitCommitHash={{ .FullCommit }}
+      - -s -w -buildid= -X github.com/oprand/opr/internal/version.GitCommitHash={{ .FullCommit }} -X github.com/oprand/opr/internal/version.Version={{ .Tag }}
 
 archives:
   - formats: [tar.gz]

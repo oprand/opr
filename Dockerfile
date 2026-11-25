@@ -26,8 +26,9 @@ RUN go mod download
 COPY . .
 
 ARG GIT_COMMIT=dev
+ARG GIT_VERSION=dev
 RUN CGO_ENABLED=0 go build -trimpath \
-	-ldflags="-buildid= -X github.com/oprand/opr/internal/version.GitCommitHash=${GIT_COMMIT}" \
+	-ldflags="-buildid= -X github.com/oprand/opr/internal/version.GitCommitHash=${GIT_COMMIT} -X github.com/oprand/opr/internal/version.Version=${GIT_VERSION}" \
 	-o /app/opr ./cmd/opr
 
 FROM alpine:3.20 AS runtime
